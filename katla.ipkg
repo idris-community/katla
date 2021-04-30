@@ -1,0 +1,44 @@
+package katla
+-- version =
+authors = "Ohad Kammar and Guillaume Allais"
+-- maintainers =
+-- license =
+-- brief =
+-- readme =
+-- homepage =
+-- sourceloc =
+-- bugtracker =
+
+-- packages to add to search path
+depends = idris2, contrib
+
+-- modules to install
+modules = Katla
+
+-- main file (i.e. file to load at REPL)
+main = Katla
+
+-- name of executable
+-- executable =
+-- opts =
+sourcedir = "src"
+-- builddir =
+-- outputdir =
+
+-- script to run before building
+-- prebuild =
+
+-- script to run after building
+-- postbuild =
+
+-- script to run after building, before installing
+-- preinstall =
+
+-- script to run after installing
+-- postinstall =
+
+-- script to run before cleaning
+-- preclean =
+
+-- script to run after cleaning
+-- postclean =
