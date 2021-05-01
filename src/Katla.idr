@@ -7,11 +7,14 @@ import Core.Core
 import Core.Metadata
 import Libraries.Data.PosMap
 import Data.List.Lazy
+import Data.List1
+
+import Numeric
 
 
 data Event 
-  = Plain     (List String)
-  | Decorated (List String) Decoration
+  = Plain     (List1 String)
+  | Decorated (List1 String) Decoration
 
 escapeLatex : Char -> String
 escapeLatex '\\' = "\\backslash"
@@ -21,34 +24,71 @@ escapeLatex x    = cast x
 
 infixr 4 |>
 
-data EventStream : Type where
-  Halt : EventStream
-  (|>) : Event -> IO EventStream -> EventStream
       
-engine : File -> LazyList ASemanticDecoration -> IO EventStream
-engine file []  
-   = do Just lines 
-              <- do Right line <- fGetLine file 
-                      | Left err => ?hole
-                    let escapedLine map escapeLatex line
-              | Nothing => Nothing
-        ?hole010
-        pure $ Plain ?engine_rhs_1 
-     |> pure   Halt
-engine fname (x :: xs)  = ?engine_rhs_3
+decoration : Decoration -> String
+decoration Typ      = "DeepSkyBlue3"
+decoration Function = "Chartreuse4"
+decoration Data     = "IndianRed1"
+decoration Keyword  = "Azure4"
+decoration Bound    = "DarkOrchid3"
 
+plain : String
+plain = "black"
 
 -- x11names
-decorate : Decoration -> String -> String
-decorate Typ      str = "{\color{DeepSkyBlue3}" ++ str ++ "}"
-decorate Function str = "{\color{Chartreuse4}"  ++ str ++ "}"
-decorate Data     str = "{\color{IndianRed1}"   ++ str ++ "}"
-decorate Keyword  str = "{\color{Azure4}"       ++ str ++ "}"
-decorate Bound    str = "{\color{DarkOrchid3}"  ++ str ++ "}"
+decorate : Decoration -> List1 String -> List1 String
+decorate dec (head ::: tail) = (decoration dec ++ head) ::: tail
 
-process : Event -> String
-process (Plain     strs    ) = str 
-process (Decorated strs dec) = decorate dec str 
+process : Event -> List1 String
+process (Plain (str ::: rest)) = (plain ++ str) ::: rest
+process (Decorated strs dec  ) = decorate dec strs
+
+
+getRemainingLines : File -> IO (List1 String)
+getRemainingLines x = ?getRemainingLines_rhs
+
+-- Assumes we indeed have input-many characters/lines!
+getLinesCols : File -> (Int, Int) -> IO (List1 String)
+getLinesCols file amount
+= pure $ reverse !(getLinesCols [] amount) 
+  where
+    getLinesCols : (acc : List String) -> (Int, Int) -> IO (List1 String)  
+    getLinesCols acc (lineCount, colCount)
+    = if lineCount <= 0
+      then either
+             (const $ pure $ "" ::: acc)
+             (pure . (::: acc))
+           !(fGetChars file colCount)
+      else either
+             (const $ pure $ "" ::: [])
+             (\line => getLinesCols (line :: acc) ?hole001010110{-(lineCount - 1, colCount)-})
+           !(fGetLine file)
+  
+engine : (input, output : File) -> (Int, Int) -> LazyList ASemanticDecoration -> IO ()
+engine inFile outFile _ []  
+   = do lines <- getRemainingLines inFile
+        let output = process (Plain lines)
+        Prelude.traverse_ (fPutStrLn outFile) output
+engine inFile outFile current@(currentLine, currentCol)  (semdecor :: rest) 
+  = case semdecor of
+      ((_, (start@(startLine, startCol)
+           ,  end@(  endLine,   endCol)))
+      , decor
+      , _) => let (decorLineDelta, decorColDelta) = let _ : Negative Int = deriveNegative
+                                                        _ : Negative (Int, Int) = PairwiseNegative
+                                                    in start - current
+                  splitLineDelta : Int = startLine - currentLine
+              in if splitLineDelta <= 0
+                 then do let colDelta = startCol - currentCol
+                         if colDelta > 0
+                          then do rest <- getLinesCols inFile (0, colDelta)
+                                  let output = process (Plain rest)
+                                  ?hole1029
+                          else ?hole19138
+                         --let output = process (Plain rest) ?engine_rhs__
+                         ?hoel1838181
+                 else ?foo
+
 
 main : IO ()
 main = do
@@ -62,6 +102,6 @@ main = do
   Right fout <- openFile "~/temp/Katla.tex" WriteTruncate
     | Left err => putStrLn "couldn't open output"
   
-  ?hole
+  --?hole
   
   putStrLn "Katla v0.0"
