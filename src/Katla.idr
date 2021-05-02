@@ -8,19 +8,26 @@ import Core.Metadata
 import Libraries.Data.PosMap
 import Data.List.Lazy
 import Data.List1
+import Data.String
 
 import Numeric
 
+
+toList : PosMap a -> List a
+--toList = Libraries.Data.PosMap.traverse (\x => [x])
 
 data Event 
   = Plain     (List1 String)
   | Decorated (List1 String) Decoration
 
-escapeLatex : Char -> String
-escapeLatex '\\' = "\\backslash"
-escapeLatex '{'  = "\\{"
-escapeLatex '}'  = "\\}"
-escapeLatex x    = cast x
+escapeLatex : Char -> List Char
+escapeLatex '\\' = unpack "\\backslash"
+escapeLatex '{'  = unpack "\\{"
+escapeLatex '}'  = unpack "\\}"
+escapeLatex x    = [x]
+
+escapeString : String -> String
+escapeString = fastPack . (concatMap escapeLatex) . fastUnpack
 
 infixr 4 |>
 
@@ -45,8 +52,15 @@ process (Decorated strs dec  ) = decorate dec strs
 
 
 getRemainingLines : File -> IO (List1 String)
-getRemainingLines x = ?getRemainingLines_rhs
-
+getRemainingLines file = getRemainingLines []
+  where
+    getRemainingLines : List String -> IO (List1 String)
+    getRemainingLines acc 
+      = if !(fEOF file)
+        then pure $ reverse ("" ::: acc)
+        else do Right str <- fGetLine file
+                  | Left err => pure $ reverse ("" ::: acc)
+                getRemainingLines (str :: acc)
 -- Assumes we indeed have input-many characters/lines!
 getLinesCols : File -> (Int, Int) -> IO (List1 String)
 getLinesCols file amount
@@ -61,9 +75,20 @@ getLinesCols file amount
            !(fGetChars file colCount)
       else either
              (const $ pure $ "" ::: [])
-             (\line => getLinesCols (line :: acc) ?hole001010110{-(lineCount - 1, colCount)-})
+             (\line => getLinesCols (line :: acc) 
+               (lineCount - 1, colCount))
            !(fGetLine file)
-  
+
+
+
+putLines : File -> List1 String -> IO ()
+putLines file (head ::: []  ) = do Right () <- fPutStr file $ escapeString head
+                                     | Left err => pure ()
+                                   pure ()
+putLines file (head ::: rest) = do Right () <- fPutStrLn file $ escapeString head
+                                     | Left err => pure ()
+                                   pure ()
+
 engine : (input, output : File) -> (Int, Int) -> LazyList ASemanticDecoration -> IO ()
 engine inFile outFile _ []  
    = do lines <- getRemainingLines inFile
@@ -74,21 +99,25 @@ engine inFile outFile current@(currentLine, currentCol)  (semdecor :: rest)
       ((_, (start@(startLine, startCol)
            ,  end@(  endLine,   endCol)))
       , decor
-      , _) => let (decorLineDelta, decorColDelta) = let _ : Negative Int = deriveNegative
-                                                        _ : Negative (Int, Int) = PairwiseNegative
-                                                    in start - current
-                  splitLineDelta : Int = startLine - currentLine
-              in if splitLineDelta <= 0
-                 then do let colDelta = startCol - currentCol
-                         if colDelta > 0
-                          then do rest <- getLinesCols inFile (0, colDelta)
-                                  let output = process (Plain rest)
-                                  ?hole1029
-                          else ?hole19138
-                         --let output = process (Plain rest) ?engine_rhs__
-                         ?hoel1838181
-                 else ?foo
-
+      , _) => 
+               do let ((decorLineDelta, decorColDelta)
+                      ,decoratedRange) : ((Int, Int) , (Int, Int))  = 
+                       let _ : Negative Int = deriveNegative
+                           _ : Negative (Int, Int) = PairwiseNegative
+                       in (start - current, end - start)
+                  let splitLineDelta = startLine - currentLine
+                  let splitColDelta =  if splitLineDelta <= 0
+                                       then startCol - currentCol
+                                       else startCol
+                  putLines outFile 
+                         $ process (Plain     !(getLinesCols inFile 
+                                                   ( splitLineDelta
+                                                   , splitColDelta)))
+                  putLines outFile
+                         $ process (Decorated !(getLinesCols inFile 
+                                                         decoratedRange)
+                                               decor)
+                  engine inFile outFile end rest
 
 main : IO ()
 main = do
@@ -102,6 +131,7 @@ main = do
   Right fout <- openFile "~/temp/Katla.tex" WriteTruncate
     | Left err => putStrLn "couldn't open output"
   
-  --?hole
+  let decs = toList fmd.semanticHighlighting 
+  ?hole
   
   putStrLn "Katla v0.0"
