@@ -1,0 +1,110 @@
+\color{Azure4}module\color{black} Katla
+
+\color{Azure4}import\color{black} System.File
+\color{Azure4}import\color{black} Core.FC
+\color{Azure4}import\color{black} Core.Name
+\color{Azure4}import\color{black} Core.Core
+\color{Azure4}import\color{black} Core.Metadata
+\color{Azure4}import\color{black} Libraries.Data.PosMap
+\color{Azure4}import\color{black} Data.List1
+\color{Azure4}import\color{black} Data.List
+\color{Azure4}import\color{black} Data.String
+
+public export
+\color{DeepSkyBlue3}Eq\color{black} \color{DeepSkyBlue3}Decoration\color{black} \color{Azure4}where\color{black}
+  \color{IndianRed1}Typ\color{black}      \color{Chartreuse4}==\color{black} \color{IndianRed1}Typ\color{black}      \color{Azure4}=\color{black} \color{IndianRed1}True\color{black}
+  \color{IndianRed1}Function\color{black} \color{Chartreuse4}==\color{black} \color{IndianRed1}Function\color{DeepSkyBlue3} \color{Azure4}=\color{DeepSkyBlue3} \color{IndianRed1}True\color{black}
+  \color{IndianRed1}Data\color{black}     \color{Chartreuse4}==\color{black} \color{IndianRed1}Data\color{black}   \color{DeepSkyBlue3}  \color{Azure4}=\color{DeepSkyBlue3} \color{IndianRed1}True\color{black}
+  \color{IndianRed1}Keyword\color{black}  \color{Chartreuse4}==\color{black} \color{IndianRed1}Keyword\color{black}  \color{Azure4}=\color{black} \color{IndianRed1}True\color{black}
+  \color{IndianRed1}Bound\color{black}    \color{Chartreuse4}==\color{black} \color{IndianRed1}Bound\color{black}    \color{Azure4}=\color{black} \color{IndianRed1}True\color{black}
+  \color{DarkOrchid3}_\color{black}    \color{DarkOrchid3} \color{black}   \color{Chartreuse4}==\color{black} _        \color{Azure4}=\color{black} \color{IndianRed1}False\color{black}
+
+\color{Chartreuse4}escapeLatex'\color{black} \color{Azure4}:\color{black} \color{DeepSkyBlue3}Char\color{black} \color{Azure4}->\color{black} \color{DeepSkyBlue3}List\color{black} \color{DeepSkyBlue3}Char\color{black}
+\color{Chartreuse4}escapeLatex'\color{black} \color{IndianRed1}'\textbackslash{}\textbackslash{}'\color{black} \color{Azure4}=\color{black} \color{Chartreuse4}unpack\color{black} \color{IndianRed1}"\textbackslash{}\textbackslash{}textbackslash\{\}"\color{black}
+\color{Chartreuse4}escapeLatex'\color{black} \color{IndianRed1}'\{'\color{black}  \color{Azure4}=\color{black} \color{Chartreuse4}unpack\color{black} \color{IndianRed1}"\textbackslash{}\textbackslash{}\{"\color{black}
+\color{Chartreuse4}escapeLatex'\color{black} \color{IndianRed1}'\}'\color{black}  \color{Azure4}=\color{black} \color{Chartreuse4}unpack\color{black} \color{IndianRed1}"\textbackslash{}\textbackslash{}\}"\color{black}
+\color{Chartreuse4}escapeLatex'\color{black} \color{DarkOrchid3}x\color{black}    \color{Azure4}=\color{black} \color{IndianRed1}[\color{DarkOrchid3}x\color{IndianRed1}]\color{black}
+
+\color{Chartreuse4}escapeLatex\color{black} \color{Azure4}:\color{black} \color{DeepSkyBlue3}Char\color{black} \color{Azure4}->\color{black} \color{DeepSkyBlue3}String\color{black}
+\color{Chartreuse4}escapeLatex\color{black} \color{IndianRed1}'\textbackslash{}\textbackslash{}'\color{black} \color{Azure4}=\color{black} \color{IndianRed1}"\textbackslash{}\textbackslash{}textbackslash\{\}"\color{black}
+\color{Chartreuse4}escapeLatex\color{black} \color{IndianRed1}'\{'\color{black}  \color{Azure4}=\color{black} \color{IndianRed1}"\textbackslash{}\textbackslash{}\{"\color{black}
+\color{Chartreuse4}escapeLatex\color{black} \color{IndianRed1}'\}'\color{black}  \color{Azure4}=\color{black} \color{IndianRed1}"\textbackslash{}\textbackslash{}\}"\color{black}
+\color{Chartreuse4}escapeLatex\color{black} \color{DarkOrchid3}x\color{black}    \color{Azure4}=\color{black} \color{Chartreuse4}cast\color{black} \color{DarkOrchid3}x\color{black}
+      
+\color{Chartreuse4}decoration\color{black} \color{Azure4}:\color{black} \color{DeepSkyBlue3}Maybe\color{black} \color{DeepSkyBlue3}Decoration\color{black} \color{Azure4}->\color{black} \color{DeepSkyBlue3}String\color{black}
+\color{Chartreuse4}decoration\color{black} \color{IndianRed1}Nothing\color{black}         \color{Azure4}=\color{black} \color{IndianRed1}"black"\color{black}
+\color{Chartreuse4}decoration\color{black} (\color{IndianRed1}Just\color{black} \color{IndianRed1}Typ\color{black}     ) \color{Azure4}=\color{black} \color{IndianRed1}"DeepSkyBlue3"\color{black}
+\color{Chartreuse4}decoration\color{black} (\color{IndianRed1}Just\color{black} \color{IndianRed1}Function\color{black}) \color{Azure4}=\color{black} \color{IndianRed1}"Chartreuse4"\color{black}
+\color{Chartreuse4}decoration\color{black} (\color{IndianRed1}Just\color{black} \color{IndianRed1}Data\color{black}    ) \color{Azure4}=\color{black} \color{IndianRed1}"IndianRed1"\color{black}
+\color{Chartreuse4}decoration\color{black} (\color{IndianRed1}Just\color{black} \color{IndianRed1}Keyword\color{black} ) \color{Azure4}=\color{black} \color{IndianRed1}"Azure4"\color{black}
+\color{Chartreuse4}decoration\color{black} (\color{IndianRed1}Just\color{black} \color{IndianRed1}Bound\color{black}   ) \color{Azure4}=\color{black} \color{IndianRed1}"DarkOrchid3"\color{black}
+
+
+\color{Chartreuse4}color\color{black} \color{Azure4}:\color{black} \color{DeepSkyBlue3}String\color{black} \color{Azure4}->\color{black} \color{DeepSkyBlue3}String\color{black}
+\color{Chartreuse4}color\color{black} \color{DarkOrchid3}x\color{black} \color{Azure4}=\color{black} \color{IndianRed1}"\textbackslash{}\textbackslash{}color\{\textbackslash{}\{\color{DarkOrchid3}x\color{IndianRed1}\}\color{Chartreuse4}\}\color{IndianRed1}"\color{black} -- String interpolation doesn't quite work yet
+
+\{- Relies on the fact that PosMap is an efficient mapping from position: 
+
+for each character in the file, find the tightest enclosing interval
+in PosMap and use its decoration.
+-\}
+
+\color{Chartreuse4}pickSmallest\color{black} \color{Azure4}:\color{black} \color{DeepSkyBlue3}List1\color{black} \color{Chartreuse4}ASemanticDecoration\color{black} \color{Azure4}->\color{black} \color{DeepSkyBlue3}Decoration\color{black}
+\color{Chartreuse4}pickSmallest\color{black} (\color{IndianRed1}(_\color{Azure4},\color{IndianRed1} \color{DarkOrchid3}decor\color{Azure4},\color{IndianRed1} _)\color{black} \color{IndianRed1}:::\color{black} \color{IndianRed1}[]\color{black}) \color{Azure4}=\color{black} \color{DarkOrchid3}decor\color{black}
+\color{Chartreuse4}pickSmallest\color{black} (\color{DarkOrchid3}current\color{black} \color{IndianRed1}:::\color{black} \color{DarkOrchid3}candidate\color{black} \color{IndianRed1}::\color{black} \color{DarkOrchid3}ds\color{black}) \color{Azure4}=\color{black} 
+  \color{Azure4}let\color{black} \color{Chartreuse4}endOf\color{black} \color{Azure4}:\color{black} \color{Chartreuse4}ASemanticDecoration\color{black} \color{Azure4}->\color{black} \color{DeepSkyBlue3}(Int\color{Azure4},\color{DeepSkyBlue3} Int)\color{black}
+      \color{Chartreuse4}endOf\color{black} \color{IndianRed1}((_\color{Azure4},\color{IndianRed1} (_\color{Azure4},\color{IndianRed1} \color{DarkOrchid3}end\color{IndianRed1}))\color{Azure4},\color{IndianRed1} _\color{Azure4},\color{IndianRed1} _)\color{black} \color{Azure4}=\color{black} \color{DarkOrchid3}end\color{black}
+  \color{Azure4}in\color{black} \color{Azure4}if\color{black} (\color{Chartreuse4}endOf\color{black} \color{DarkOrchid3}candidate\color{black} \color{Chartreuse4}<\color{black} \color{Chartreuse4}endOf\color{black} \color{DarkOrchid3}current\color{black})
+     \color{Azure4}then\color{black} \color{Chartreuse4}pickSmallest\color{black} (\color{DarkOrchid3}candidate\color{black} \color{IndianRed1}:::\color{black} \color{DarkOrchid3}ds\color{black})
+     \color{Azure4}else\color{black} \color{Chartreuse4}pickSmallest\color{black} (\color{DarkOrchid3}current\color{black}   \color{IndianRed1}:::\color{black} \color{DarkOrchid3}ds\color{black})
+
+\color{Chartreuse4}findDecoration\color{black} \color{Azure4}:\color{black} \color{DeepSkyBlue3}(Int\color{Azure4},\color{DeepSkyBlue3} Int)\color{black} \color{Azure4}->\color{black} \color{DeepSkyBlue3}PosMap\color{black} \color{Chartreuse4}ASemanticDecoration\color{black} \color{Azure4}->\color{black} \color{DeepSkyBlue3}Maybe\color{black} \color{DeepSkyBlue3}Decoration\color{black}
+\color{Chartreuse4}findDecoration\color{black} \color{DarkOrchid3}pos\color{Azure4}@\color{IndianRed1}(\color{DarkOrchid3}row\color{Azure4},\color{IndianRed1} \color{DarkOrchid3}col\color{IndianRed1})\color{black} \color{DarkOrchid3}posMap\color{black} \color{Azure4}=\color{black} 
+  \color{Azure4}case\color{black} \color{Chartreuse4}dominators\color{black} \color{IndianRed1}((\color{DarkOrchid3}row\color{Azure4},\color{IndianRed1} \color{DarkOrchid3}col\color{IndianRed1})\color{Azure4},\color{IndianRed1} (\color{DarkOrchid3}row\color{Azure4},\color{IndianRed1} \color{DarkOrchid3}col\color{Chartreuse4}+\color{IndianRed1}1))\color{black} \color{DarkOrchid3}posMap\color{black} \color{Azure4}of\color{black}
+   \color{IndianRed1}[]\color{black}              \color{Azure4}=>\color{black} \color{IndianRed1}Nothing\color{black}
+   (\color{DarkOrchid3}d\color{black} \color{IndianRed1}::\color{black} \color{DarkOrchid3}ds\color{black})       \color{Azure4}=>\color{black} \color{IndianRed1}Just\color{black} $ \color{Chartreuse4}pickSmallest\color{black} (\color{DarkOrchid3}d\color{black} \color{IndianRed1}:::\color{black} \color{DarkOrchid3}ds\color{black})
+
+\color{Chartreuse4}engine\color{black} \color{Azure4}:\color{black} \color{Azure4}(\color{DarkOrchid3}input\color{Azure4},\color{black} \color{DarkOrchid3}output\color{black} \color{Azure4}:\color{black} \color{DeepSkyBlue3}File\color{Azure4})\color{black} \color{Azure4}->\color{black} \color{DeepSkyBlue3}PosMap\color{black} \color{Chartreuse4}ASemanticDecoration\color{black} \color{Azure4}->\color{black} \color{DeepSkyBlue3}(Int\color{Azure4},\color{DeepSkyBlue3} Int)\color{black} \color{Azure4}->\color{black} \color{DeepSkyBlue3}IO\color{black} \color{DeepSkyBlue3}()\color{black}
+\color{Chartreuse4}engine\color{black} \color{DarkOrchid3}input\color{black} \color{DarkOrchid3}output\color{black} \color{DarkOrchid3}posMap\color{black} \color{Azure4}=\color{black} \color{Chartreuse4}engine\color{black} \color{IndianRed1}Nothing\color{black}
+  \color{Azure4}where\color{black}
+    \color{Chartreuse4}processLine\color{black} \color{Azure4}:\color{black} \color{DeepSkyBlue3}Maybe\color{black} \color{DeepSkyBlue3}Decoration\color{black} \color{Azure4}->\color{black} \color{DeepSkyBlue3}(Int\color{Azure4},\color{DeepSkyBlue3} Int)\color{black} \color{Azure4}->\color{black} \color{DeepSkyBlue3}List\color{black} \color{DeepSkyBlue3}Char\color{black} \color{Azure4}->\color{black} \color{DeepSkyBlue3}IO\color{black} \color{DeepSkyBlue3}(Maybe Decoration\color{Azure4},\color{DeepSkyBlue3} (Int\color{Azure4},\color{DeepSkyBlue3} Int))\color{black}
+    \color{Chartreuse4}processLine\color{black} \color{DarkOrchid3}currentDecor\color{black} \color{IndianRed1}(\color{DarkOrchid3}currentRow\color{Azure4},\color{IndianRed1} _)\color{black} \color{IndianRed1}[]\color{black} \color{Azure4}=\color{black} do
+      \color{Azure4}let\color{black} \color{DarkOrchid3}nextPos\color{black} \color{Azure4}=\color{black} \color{IndianRed1}(\color{DarkOrchid3}currentRow\color{IndianRed1} \color{Chartreuse4}+\color{IndianRed1} 1\color{Azure4},\color{IndianRed1} 0)\color{black}
+      \color{Chartreuse4}pure\color{black} \color{IndianRed1}(\color{DarkOrchid3}currentDecor\color{Azure4},\color{IndianRed1} \color{DarkOrchid3}nextPos\color{IndianRed1})\color{black}
+    \color{Chartreuse4}processLine\color{black} \color{DarkOrchid3}currentDecor\color{black} \color{DarkOrchid3}currentPos\color{Azure4}@\color{IndianRed1}(\color{DarkOrchid3}currentRow\color{Azure4},\color{IndianRed1} \color{DarkOrchid3}currentCol\color{IndianRed1})\color{black} (\color{DarkOrchid3}c\color{black} \color{IndianRed1}::\color{black} \color{DarkOrchid3}rest\color{black}) \color{Azure4}=\color{black} 
+      \color{Azure4}let\color{black} \color{DarkOrchid3}nextPos\color{black} \color{Azure4}=\color{black} \color{IndianRed1}(\color{DarkOrchid3}currentRow\color{Azure4},\color{IndianRed1} \color{DarkOrchid3}currentCol\color{IndianRed1} \color{Chartreuse4}+\color{IndianRed1} 1)\color{black} 
+          \color{DarkOrchid3}decor\color{black}   \color{Azure4}=\color{black} \color{Chartreuse4}findDecoration\color{black} \color{DarkOrchid3}currentPos\color{black} \color{DarkOrchid3}posMap\color{black} \color{Azure4}in\color{black}
+      \color{Azure4}if\color{black} \color{DarkOrchid3}decor\color{black} \color{Chartreuse4}==\color{black} \color{DarkOrchid3}currentDecor\color{black} 
+      \color{Azure4}then\color{black} do _ \color{Azure4}<-\color{black} \color{Chartreuse4}fPutStr\color{black} \color{DarkOrchid3}output\color{black} (\color{Chartreuse4}escapeLatex\color{black} \color{DarkOrchid3}c\color{black})
+              \color{Chartreuse4}processLine\color{black} \color{DarkOrchid3}currentDecor\color{black} \color{DarkOrchid3}nextPos\color{black} \color{DarkOrchid3}rest\color{black}
+      \color{Azure4}else\color{black} do _ \color{Azure4}<-\color{black} \color{Chartreuse4}fPutStr\color{black} \color{DarkOrchid3}output\color{black} $ \color{Chartreuse4}color\color{black} (\color{Chartreuse4}decoration\color{black} \color{DarkOrchid3}decor\color{black}) \color{Chartreuse4}++\color{black} \color{Chartreuse4}escapeLatex\color{black} \color{DarkOrchid3}c\color{black}
+              \color{Chartreuse4}processLine\color{black} \color{DarkOrchid3}decor\color{black}        \color{DarkOrchid3}nextPos\color{black} \color{DarkOrchid3}rest\color{black}
+  
+    \color{Chartreuse4}engine\color{black} \color{Azure4}:\color{black} \color{DeepSkyBlue3}Maybe\color{black} \color{DeepSkyBlue3}Decoration\color{black} \color{Azure4}->\color{black} \color{DeepSkyBlue3}(Int\color{Azure4},\color{DeepSkyBlue3} Int)\color{black} \color{Azure4}->\color{black} \color{DeepSkyBlue3}IO\color{black} \color{DeepSkyBlue3}()\color{black}
+    \color{Chartreuse4}engine\color{black} \color{DarkOrchid3}currentDecor\color{black} \color{DarkOrchid3}currentPos\color{black} 
+      \color{Azure4}=\color{black} \color{Azure4}if\color{black} \color{Azure4}!\color{black}(\color{Chartreuse4}fEOF\color{black} \color{DarkOrchid3}input\color{black})
+      \color{Azure4}then\color{black} \color{Chartreuse4}pure\color{black} \color{IndianRed1}()\color{black}
+      \color{Azure4}else\color{black} do
+        \color{IndianRed1}Right\color{black} \color{DarkOrchid3}str\color{black} \color{Azure4}<-\color{black} \color{Chartreuse4}fGetLine\color{black} \color{DarkOrchid3}input\color{black}
+          \color{Azure4}|\color{black} \color{IndianRed1}Left\color{black} \color{DarkOrchid3}err\color{black} \color{Azure4}=>\color{black} \color{Chartreuse4}pure\color{black} \color{IndianRed1}()\color{black}
+        \color{IndianRed1}(\color{DarkOrchid3}nextDecor\color{Azure4},\color{IndianRed1} \color{DarkOrchid3}nextPos\color{IndianRed1})\color{black} \color{Azure4}<-\color{black} \color{Chartreuse4}processLine\color{black} \color{DarkOrchid3}currentDecor\color{black} \color{DarkOrchid3}currentPos\color{black} (\color{Chartreuse4}fastUnpack\color{black} \color{DarkOrchid3}str\color{black})
+        \color{Chartreuse4}engine\color{black} \color{DarkOrchid3}nextDecor\color{black} \color{DarkOrchid3}nextPos\color{black}
+    
+\color{Chartreuse4}main\color{black} \color{Azure4}:\color{black} \color{DeepSkyBlue3}IO\color{black} \color{DeepSkyBlue3}()\color{black}
+\color{Chartreuse4}main\color{black} \color{Azure4}=\color{black} do
+  \color{Chartreuse4}putStrLn\color{black} \color{IndianRed1}"Katla v0.1"\color{black}
+  \color{IndianRed1}Right\color{black} \color{DarkOrchid3}fin\color{black} \color{Azure4}<-\color{black} \color{Chartreuse4}openFile\color{black} \color{IndianRed1}"src/Katla.idr"\color{black}  \color{IndianRed1}Read\color{black}
+    \color{Azure4}|\color{black} \color{IndianRed1}Left\color{black} \color{DarkOrchid3}err\color{black} \color{Azure4}=>\color{black} \color{Chartreuse4}putStrLn\color{black} \color{IndianRed1}"Couldn't open source."\color{black}
+  \color{IndianRed1}Just\color{black} \color{DarkOrchid3}fmd\color{black} \color{Azure4}<-\color{black} \color{Chartreuse4}coreRun\color{black} (\color{Chartreuse4}map\color{black} \color{IndianRed1}Just\color{black} (\color{Chartreuse4}readMetadata\color{black} \color{IndianRed1}"build/ttc/Katla.ttm"\color{black}))
+                      (\color{Chartreuse4}const\color{black} $ \color{Chartreuse4}pure\color{black} \color{IndianRed1}Nothing\color{black})
+                      \color{Chartreuse4}pure\color{black}
+    \color{Azure4}|\color{black} \color{IndianRed1}Nothing\color{black} \color{Azure4}=>\color{black} \color{Chartreuse4}putStrLn\color{black} \color{IndianRed1}"Couldn't open metadata"\color{black}
+  
+  \color{IndianRed1}Right\color{black} \color{DarkOrchid3}fout\color{black} \color{Azure4}<-\color{black} \color{Chartreuse4}openFile\color{black} \color{IndianRed1}"temp/Katla.tex"\color{black} \color{IndianRed1}WriteTruncate\color{black}
+    \color{Azure4}|\color{black} \color{IndianRed1}Left\color{black} \color{DarkOrchid3}err\color{black} \color{Azure4}=>\color{black} \color{Chartreuse4}putStrLn\color{black} \color{IndianRed1}"couldn't open output"\color{black}
+
+  \{- Prints annotations, for debugging purposes -\}
+  -- let decs = foldr (\textbackslash{}x,xs => Prelude.(::) x xs) Prelude.Nil $ fmd.semanticHighlighting
+  -- traverse_ (\textbackslash{}((_, (start, end)), decor, _) => putStrLn "\textbackslash{}\{show start\}:\textbackslash{}\{show end\}: \textbackslash{}\{show decor\}")
+  --           decs
+  \color{Chartreuse4}engine\color{black} \color{DarkOrchid3}fin\color{black} \color{DarkOrchid3}fout\color{black} \color{DarkOrchid3}fmd\color{Chartreuse4}.semanticHighlighting\color{black} \color{IndianRed1}(0\color{Azure4},\color{IndianRed1}0)\color{black}

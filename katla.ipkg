@@ -14,13 +14,12 @@ depends = idris2, contrib
 
 -- modules to install
 modules = Katla
-        , Numeric
 
 -- main file (i.e. file to load at REPL)
 main = Katla
 
 -- name of executable
--- executable =
+executable = katla
 -- opts =
 sourcedir = "src"
 -- builddir =
