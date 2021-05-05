@@ -70,6 +70,7 @@ engine input output posMap = engine Nothing
     processLine : Maybe Decoration -> (Int, Int) -> List Char -> IO (Maybe Decoration, (Int, Int))
     processLine currentDecor (currentRow, _) [] = do
       let nextPos = (currentRow + 1, 0)
+      _ <- fPutStr output $ color (decoration currentDecor)
       pure (currentDecor, nextPos)
     processLine currentDecor currentPos@(currentRow, currentCol) (c :: rest) = 
       let nextPos = (currentRow, currentCol + 1) 
