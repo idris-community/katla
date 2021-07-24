@@ -14,7 +14,6 @@ depends = idris2, contrib
 
 -- modules to install
 modules = Katla
-        , Data.SnocList
 
 -- main file (i.e. file to load at REPL)
 main = Katla

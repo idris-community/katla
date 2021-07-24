@@ -112,10 +112,10 @@ engine input output posMap = engine Nothing
     isNotEndOfLine ('\r' :: _ ) = Nothing
     isNotEndOfLine ('\n' :: _ ) = Nothing
     isNotEndOfLine (x    :: xs) = Just (x, xs)
-    
+
     ship : Maybe Decoration -> (outputChars : SnocList Char) -> IO ()
     ship decor outputChars = when (isSnoc outputChars) $ do
-      let decorated = annotate decor (toString outputChars) 
+      let decorated = annotate decor (toString outputChars)
       _ <- fPutStr output decorated
       pure ()
 
@@ -126,7 +126,7 @@ engine input output posMap = engine Nothing
                -> IO (Maybe Decoration, (Int, Int))
     processLine currentDecor currentPos@(currentRow, currentCol) cs currentOutput
       = case isNotEndOfLine cs of
-          Nothing => do 
+          Nothing => do
             let nextPos = (currentRow + 1, 0)
             ship currentDecor currentOutput
             _ <- fPutStrLn output ""
@@ -138,14 +138,14 @@ engine input output posMap = engine Nothing
             if decor == currentDecor
              then processLine currentDecor nextPos rest (snocEscape currentOutput c)
              else do ship currentDecor currentOutput
-                     processLine decor nextPos rest (snocEscape Empty c)
+                     processLine decor nextPos rest (snocEscape [<] c)
 
     engine : Maybe Decoration -> (Int, Int) -> IO ()
     engine currentDecor currentPos
       = when (not !(fEOF input)) $ do
           Right str <- fGetLine input
             | Left err => pure ()
-          (nextDecor, nextPos) <- processLine currentDecor currentPos (fastUnpack str) Empty
+          (nextDecor, nextPos) <- processLine currentDecor currentPos (fastUnpack str) [<]
           engine nextDecor nextPos
 
 main : IO ()
