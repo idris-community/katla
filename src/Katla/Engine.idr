@@ -132,6 +132,43 @@ standalonePost = """
   \\end{document}
   """
 
+record FileHandles where
+  constructor MkHandles
+  config : Config
+  source, output : File
+  metadata : PosMap ASemanticDecoration
+
+data Error a = ReportedError | Unreported a
+
+exit : IO (Either (Engine.Error a) b)
+exit = pure (Left ReportedError)
+
+export
+setupFiles : (mconfig : Maybe String) ->
+  (msourcefile, mmetadata : String) -> (moutput : Maybe String) ->
+  IO (Either (Error Void) FileHandles)
+setupFiles mconfig filename metadata moutput = do
+  config <- getConfiguration mconfig
+  Right source <- openFile filename  Read
+  | Left err => do putStrLn "Couldn't open source file: \{filename}."
+                   exit
+  Just fmd <- coreRun (map Just (readMetadata metadata))
+                      (\err => do putStrLn $ show err
+                                  pure Nothing)
+                      pure
+  | Nothing => do putStrLn "Couldn't open metadata file: \{metadata}"
+                  exit
+
+  Right output <- maybe (pure $ Right stdout) (\output => openFile output WriteTruncate) moutput
+  | Left err => do putStrLn "couldn't open output: "
+                   exit
+
+
+  pure $ Right $ MkHandles
+    { config, source, output
+    , metadata = fmd.semanticHighlighting
+    }
+
 export
 katla : (snippet : Bool) -> (mconfig : Maybe String) ->
   (msourcefile, mmetadata, moutput : Maybe String) ->
@@ -139,24 +176,24 @@ katla : (snippet : Bool) -> (mconfig : Maybe String) ->
   IO ()
 katla _       _       Nothing _       _ = putStrLn "Expecting source file to print."
 katla _       _       _       Nothing _ = putStrLn "Expecting metadata file to output."
-katla False   mconfig (Just filename) (Just metadata) moutput= do
-  config <- getConfiguration mconfig
-  Right fin <- openFile filename  Read
-  | Left err => putStrLn "Couldn't open source file: \{filename}."
-  Just fmd <- coreRun (map Just (readMetadata metadata))
-                      (\err => do putStrLn $ show err
-                                  pure Nothing)
-                      pure
-    | Nothing => putStrLn "Couldn't open metadata file: \{metadata}"
+-- Generate a fully formed LaTeX file
+katla False   mconfig (Just filename) (Just metadata) moutput = do
+  Right files <- setupFiles mconfig filename metadata moutput
+  | Left ReportedError => pure ()
 
-  Right fout <- maybe (pure $ Right stdout) (\output => openFile output WriteTruncate) moutput
-  | Left err => putStrLn "couldn't open output: "
-
-  Right _ <- fPutStrLn fout (standalonePre config)
+  Right _ <- fPutStrLn files.output (standalonePre files.config)
   | Left err => putStrLn "Error while generating preamble: \{show err}"
-  engine fin fout fmd.semanticHighlighting (0,0)
-  Right _ <- fPutStrLn fout standalonePost
+  engine files.source files.output files.metadata (0,0)
+  Right _ <- fPutStrLn files.output standalonePost
   | Left err => putStrLn "Error while generating preamble: \{show err}"
-  closeFile fout
+  closeFile files.output
+-- Generate only the listing code
+katla True mconfig (Just filename) (Just metadata) moutput = do
+  Right files <- setupFiles mconfig filename metadata moutput
+  | Left ReportedError => pure ()
 
-katla True mconfig msrc mmeta moutput = putStrLn "Not yet implemented."
+  engine files.source files.output files.metadata (0,0)
+  Right _ <- fPutStrLn files.output standalonePost
+  | Left err => putStrLn "Error while generating preamble: \{show err}"
+
+  closeFile files.output

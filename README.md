@@ -15,6 +15,6 @@ Dependencies:
 Wishlist:
 
 + Error handling
-+ Flag for generating the preamble as a stand-alone file that can be imported into a LaTeX doc
-+ Flag for generating standalone document, single file and multi-file
++ Better support for incorporating into bigger documents by generating macros
++ Batch mode
 + Separate into a library + driver module (so we could write Idris programs that generate such sources)
