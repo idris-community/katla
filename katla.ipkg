@@ -10,10 +10,15 @@ authors = "Ohad Kammar and Guillaume Allais"
 -- bugtracker =
 
 -- packages to add to search path
-depends = idris2, contrib
+depends = idris2, contrib, collie, idrall
 
 -- modules to install
-modules = Katla
+modules
+  = Katla
+  , Katla.Config
+  , Katla.CLI
+  , Katla.Engine
+
 
 -- main file (i.e. file to load at REPL)
 main = Katla
