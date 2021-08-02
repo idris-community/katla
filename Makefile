@@ -6,8 +6,8 @@ build/exec/katla: .PHONY
 	idris2 --build katla.ipkg
 
 temp/Example.pdf: build/exec/katla
-	build/exec/katla  ./src/Katla/Engine.idr ./build/ttc/Katla/Engine.ttm \
-          | pdflatex -output-directory=temp
+	./build/exec/katla  ./src/Katla/Engine.idr ./build/ttc/Katla/Engine.ttm \
+          | pdflatex -output-directory=temp -jobname=Example
 
 clean:
 	idris2 --clean katla.ipkg
