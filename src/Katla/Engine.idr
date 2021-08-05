@@ -169,15 +169,28 @@ setupFiles mconfig filename metadata moutput = do
     , metadata = fmd.semanticHighlighting
     }
 
+public export
+data Snippet = Raw | Macro String
+
+makeMacroPre : String -> String
+makeMacroPre name = """
+  \\newcommand\\\{name}{\\UseVerbatim{\{name}}}
+  \\begin{SaveVerbatim}[commandchars=\\\\\\{\\}]{\{name}}
+  """
+makeMacroPost : String
+makeMacroPost = """
+  \\end{SaveVerbatim}
+  """
+
 export
-katla : (snippet : Bool) -> (mconfig : Maybe String) ->
+katla : (snippet : Maybe Snippet) -> (mconfig : Maybe String) ->
   (msourcefile, mmetadata, moutput : Maybe String) ->
   -- TODO: would be nice to only specify one of source/metadata
   IO ()
 katla _       _       Nothing _       _ = putStrLn "Expecting source file to print."
 katla _       _       _       Nothing _ = putStrLn "Expecting metadata file to output."
 -- Generate a fully formed LaTeX file
-katla False   mconfig (Just filename) (Just metadata) moutput = do
+katla Nothing mconfig (Just filename) (Just metadata) moutput = do
   Right files <- setupFiles mconfig filename metadata moutput
   | Left ReportedError => pure ()
 
@@ -188,12 +201,23 @@ katla False   mconfig (Just filename) (Just metadata) moutput = do
   | Left err => putStrLn "Error while generating preamble: \{show err}"
   closeFile files.output
 -- Generate only the listing code
-katla True mconfig (Just filename) (Just metadata) moutput = do
+katla (Just snippet) mconfig (Just filename) (Just metadata) moutput = do
   Right files <- setupFiles mconfig filename metadata moutput
   | Left ReportedError => pure ()
-
+  case snippet of
+    Raw => pure ()
+    Macro name => do -- TODO: validate macro name, perhaps when parsing
+      Right _ <- fPutStrLn files.output (makeMacroPre name)
+      | Left err => putStrLn
+        "Error while generating macro name \{name}: \{show err}"
+      pure ()
   engine files.source files.output files.metadata (0,0)
-  Right _ <- fPutStrLn files.output standalonePost
-  | Left err => putStrLn "Error while generating preamble: \{show err}"
+  case snippet of
+    Raw => pure ()
+    Macro name => do
+      Right _ <- fPutStrLn files.output makeMacroPost
+      | Left err => putStrLn
+        "Error while generating macro name \{name}: \{show err}"
+      pure ()
 
   closeFile files.output
