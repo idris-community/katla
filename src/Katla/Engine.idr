@@ -90,6 +90,32 @@ engineWithDecor input output posMap currentDecor currentPos
                               (fastUnpack str) [<]
       engineWithDecor input output posMap nextDecor nextPos
 
+public export
+record ListingRange where
+  constructor MkListingRange
+  offset, before, after : Int
+
+(.startRow) : ListingRange -> Int
+range.startRow = range.offset - range.before
+
+(.endRow) : ListingRange -> Int
+range.endRow = range.offset + range.after
+
+engineWithRange : (input, output : File)
+       -> PosMap ASemanticDecoration -> ListingRange
+       -> Maybe Decoration -> (Int, Int) -> IO ()
+engineWithRange input output posMap rowRange currentDecor currentPos
+  = when (not !(fEOF input)) $ do
+      Right str <- fGetLine input
+        | Left err => pure ()
+      (nextDecor, nextPos) <-(
+        if rowRange.startRow <= (fst currentPos) && (fst currentPos) <= rowRange.endRow
+        then processLine output posMap currentDecor currentPos
+                                (fastUnpack str) [<]
+        else pure (Nothing, (fst currentPos + 1, 0)))
+      engineWithRange input output posMap  rowRange nextDecor nextPos
+
+
 export
 engine : (input, output : File)
        -> PosMap ASemanticDecoration
@@ -136,7 +162,11 @@ setupFiles mconfig filename metadata moutput = do
     }
 
 public export
-data Snippet = Raw | Macro String
+data Snippet = Raw (Maybe ListingRange) | Macro (String, Maybe ListingRange)
+
+(.listing) : Snippet -> Maybe ListingRange
+(Raw mrange       ).listing = mrange
+(Macro (_, mrange)).listing = mrange
 
 export
 katla : (snippet : Maybe Snippet) -> (mconfig : Maybe String) ->
@@ -161,16 +191,20 @@ katla (Just snippet) mconfig (Just filename) (Just metadata) moutput = do
   Right files <- setupFiles mconfig filename metadata moutput
   | Left ReportedError => pure ()
   case snippet of
-    Raw => pure ()
-    Macro name => do -- TODO: validate macro name, perhaps when parsing
+    Raw _ => pure ()
+    Macro (name, mrange) => do -- TODO: validate macro name, perhaps when parsing
       Right _ <- fPutStrLn files.output (makeMacroPre name)
       | Left err => putStrLn
         "Error while generating macro name \{name}: \{show err}"
       pure ()
-  engine files.source files.output files.metadata (0,0)
+  case snippet.listing of
+    Nothing    => engine          files.source files.output files.metadata
+                                         (0,0)
+    Just range => engineWithRange files.source files.output files.metadata
+                                  range Nothing (0,0)
   case snippet of
-    Raw => pure ()
-    Macro name => do
+    Raw _ => pure ()
+    Macro (name, mrange) => do
       Right _ <- fPutStrLn files.output makeMacroPost
       | Left err => putStrLn
         "Error while generating macro name \{name}: \{show err}"
