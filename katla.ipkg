@@ -18,6 +18,7 @@ modules
   , Katla.Config
   , Katla.CLI
   , Katla.Engine
+  , Katla.LaTeX
 
 
 -- main file (i.e. file to load at REPL)

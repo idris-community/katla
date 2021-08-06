@@ -12,29 +12,8 @@ import Data.String
 import Data.SnocList
 
 import Katla.Config
+import Katla.LaTeX
 
-escapeLatex : Char -> List Char
-escapeLatex '\\' = fastUnpack "\\textbackslash{}"
-escapeLatex '{'  = fastUnpack "\\{"
-escapeLatex '}'  = fastUnpack "\\}"
-escapeLatex x    = [x]
-
-annotate : Maybe Decoration -> String -> String
-annotate Nothing    s = s
-annotate (Just dec) s = apply (convert dec) s
-  where
-    convert : Decoration -> String
-    convert (Typ     ) = "IdrisType"
-    convert (Function) = "IdrisFunction"
-    convert (Data    ) = "IdrisData"
-    convert (Keyword ) = "IdrisKeyword"
-    convert (Bound   ) = "IdrisBound"
-
-    apply : String -> String -> String
-    apply f a = "\\\{f}{\{a}}"
-
-color : String -> String
-color x = "\\color{\{x}}"
 
 {- Relies on the fact that PosMap is an efficient mapping from position:
 
@@ -118,25 +97,6 @@ engine : (input, output : File)
        -> IO ()
 engine input output posMap = engineWithDecor input output posMap Nothing
 
-standalonePre : Config -> String
-standalonePre config = """
-  \\documentclass{article}
-
-  \\usepackage{fancyvrb}
-  \\usepackage[x11names]{xcolor}
-
-  \{laTeXHeader config}
-
-  \\begin{document}
-  %\\VerbatimInput[commandchars=\\\\\\{\\}]{content}
-  \\begin{Verbatim}[commandchars=\\\\\\{\\}]
-  """
-
-standalonePost : String
-standalonePost = """
-  \\end{Verbatim}
-  \\end{document}
-  """
 
 record FileHandles where
   constructor MkHandles
@@ -177,16 +137,6 @@ setupFiles mconfig filename metadata moutput = do
 
 public export
 data Snippet = Raw | Macro String
-
-makeMacroPre : String -> String
-makeMacroPre name = """
-  \\newcommand\\\{name}{\\UseVerbatim{\{name}}}
-  \\begin{SaveVerbatim}[commandchars=\\\\\\{\\}]{\{name}}
-  """
-makeMacroPost : String
-makeMacroPost = """
-  \\end{SaveVerbatim}
-  """
 
 export
 katla : (snippet : Maybe Snippet) -> (mconfig : Maybe String) ->

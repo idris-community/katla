@@ -3,6 +3,7 @@ module Katla.CLI
 import public Collie
 
 import Katla.Config
+import Katla.LaTeX
 import Katla.Engine
 
 %default covering
