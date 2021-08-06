@@ -57,60 +57,66 @@ findDecoration pos@(row, col) posMap =
    []              => Nothing
    (d :: ds)       => Just $ pickSmallest (d ::: ds)
 
+toString : SnocList Char -> String
+toString sx = (fastPack $ sx <>> [])
+
+snocEscape : (outputChars : SnocList Char) -> (new : Char) -> SnocList Char
+snocEscape sx c = sx <>< (escapeLatex c)
+
+
+||| True if input starts with EOL
+isNotEndOfLine : List Char -> Maybe (Char, List Char)
+isNotEndOfLine []           = Nothing
+isNotEndOfLine ('\r' :: _ ) = Nothing
+isNotEndOfLine ('\n' :: _ ) = Nothing
+isNotEndOfLine (x    :: xs) = Just (x, xs)
+
+ship : (output : File) -> Maybe Decoration -> (outputChars : SnocList Char) -> IO ()
+ship output decor outputChars = when (isSnoc outputChars) $ do
+   let decorated = annotate decor (toString outputChars)
+   _ <- fPutStr output decorated
+   pure ()
+
+processLine : (output : File)
+           -> PosMap ASemanticDecoration
+           -> (currentDecor  : Maybe Decoration)
+           -> (currentPos    : (Int, Int))
+           -> (remainingLine : List Char)
+           -> (currentOutput : SnocList Char)
+           -> IO (Maybe Decoration, (Int, Int))
+processLine output posMap currentDecor currentPos@(currentRow, currentCol) cs currentOutput
+  = case isNotEndOfLine cs of
+      Nothing => do
+        let nextPos = (currentRow + 1, 0)
+        ship output currentDecor currentOutput
+        _ <- fPutStrLn output ""
+        pure (currentDecor, nextPos)
+      Just (c , rest) => do
+        let (currentRow, currentCol) = currentPos
+            nextPos = (currentRow, currentCol + 1)
+            decor   = findDecoration currentPos posMap
+        if decor == currentDecor
+         then processLine output posMap currentDecor nextPos rest (snocEscape currentOutput c)
+         else do ship output currentDecor currentOutput
+                 processLine output posMap decor nextPos rest (snocEscape [<] c)
+
+engineWithDecor : (input, output : File)
+       -> PosMap ASemanticDecoration
+       -> Maybe Decoration -> (Int, Int) -> IO ()
+engineWithDecor input output posMap currentDecor currentPos
+  = when (not !(fEOF input)) $ do
+      Right str <- fGetLine input
+        | Left err => pure ()
+      (nextDecor, nextPos) <- processLine output posMap currentDecor currentPos
+                              (fastUnpack str) [<]
+      engineWithDecor input output posMap nextDecor nextPos
+
 export
 engine : (input, output : File)
        -> PosMap ASemanticDecoration
        -> (Int, Int)
        -> IO ()
-engine input output posMap = engine Nothing
-  where
-    toString : SnocList Char -> String
-    toString sx = (fastPack $ sx <>> [])
-
-    snocEscape : (outputChars : SnocList Char) -> (new : Char) -> SnocList Char
-    snocEscape sx c = sx <>< (escapeLatex c)
-
-    ||| True if input starts with EOL
-    isNotEndOfLine : List Char -> Maybe (Char, List Char)
-    isNotEndOfLine []           = Nothing
-    isNotEndOfLine ('\r' :: _ ) = Nothing
-    isNotEndOfLine ('\n' :: _ ) = Nothing
-    isNotEndOfLine (x    :: xs) = Just (x, xs)
-
-    ship : Maybe Decoration -> (outputChars : SnocList Char) -> IO ()
-    ship decor outputChars = when (isSnoc outputChars) $ do
-      let decorated = annotate decor (toString outputChars)
-      _ <- fPutStr output decorated
-      pure ()
-
-    processLine : (currentDecor  : Maybe Decoration)
-               -> (currentPos    : (Int, Int))
-               -> (remainingLine : List Char)
-               -> (currentOutput : SnocList Char)
-               -> IO (Maybe Decoration, (Int, Int))
-    processLine currentDecor currentPos@(currentRow, currentCol) cs currentOutput
-      = case isNotEndOfLine cs of
-          Nothing => do
-            let nextPos = (currentRow + 1, 0)
-            ship currentDecor currentOutput
-            _ <- fPutStrLn output ""
-            pure (currentDecor, nextPos)
-          Just (c , rest) => do
-            let (currentRow, currentCol) = currentPos
-                nextPos = (currentRow, currentCol + 1)
-                decor   = findDecoration currentPos posMap
-            if decor == currentDecor
-             then processLine currentDecor nextPos rest (snocEscape currentOutput c)
-             else do ship currentDecor currentOutput
-                     processLine decor nextPos rest (snocEscape [<] c)
-
-    engine : Maybe Decoration -> (Int, Int) -> IO ()
-    engine currentDecor currentPos
-      = when (not !(fEOF input)) $ do
-          Right str <- fGetLine input
-            | Left err => pure ()
-          (nextDecor, nextPos) <- processLine currentDecor currentPos (fastUnpack str) [<]
-          engine nextDecor nextPos
+engine input output posMap = engineWithDecor input output posMap Nothing
 
 standalonePre : Config -> String
 standalonePre config = """
