@@ -1,0 +1,5 @@
+if cmp -s "$1" "$2" ; then
+   echo "Expected: $3 gives the same results"
+else
+   echo "Error: $3 gives different results"
+fi

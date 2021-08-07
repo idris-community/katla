@@ -36,6 +36,10 @@ color x = "\\color{\{x}}"
 export
 laTeXHeader : Config -> String
 laTeXHeader cfg =  """
+\\usepackage{fancyvrb}
+\\usepackage[x11names]{xcolor}
+
+\\newcommand{\\Katla}                [1]{\\VerbatimInput[commandchars=\\\\\\{\\}]{#1}}
 \\newcommand{\\IdrisHlightFont}         {\{cfg.font}}
 \\newcommand{\\IdrisHlightStyleData}    {\{cfg.datacons.style}}
 \\newcommand{\\IdrisHlightStyleType}    {\{cfg.typecons.style}}
@@ -56,7 +60,7 @@ laTeXHeader cfg =  """
 \\newcommand{\\IdrisHlightColourHole}    {\{cfg.hole    .colour}}
 
 \\newcommand{\\IdrisHole}[1]{{%
-    \\colorbox{yellow}{%
+    \\colorbox{\\IdrisHlightColourHole}{%
       \\IdrisHlightStyleHole\\IdrisHlightFont%
       #1}}}
 
@@ -69,6 +73,7 @@ laTeXHeader cfg =  """
 \\newcommand{\\IdrisKeyword}[1]{\\RawIdrisHighlight{\\IdrisHlightColourKeyword}{\\IdrisHlightStyleKeyword}{#1}}
 \\newcommand{\\IdrisImplicit}[1]{\\RawIdrisHighlight{\\IdrisHlightColourImplicit}{\\IdrisHlightStyleImplicit}{#1}}
 \\newcommand{\\IdrisComment}[1]{\\RawIdrisHighlight{\\IdrisHlightColourComment}{\\IdrisHlightStyleComment}{#1}}
+
 """
 
 
@@ -77,13 +82,9 @@ standalonePre : Config -> String
 standalonePre config = """
   \\documentclass{article}
 
-  \\usepackage{fancyvrb}
-  \\usepackage[x11names]{xcolor}
-
   \{laTeXHeader config}
 
   \\begin{document}
-  %\\VerbatimInput[commandchars=\\\\\\{\\}]{content}
   \\begin{Verbatim}[commandchars=\\\\\\{\\}]
   """
 

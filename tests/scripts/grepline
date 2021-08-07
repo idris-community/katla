@@ -1,0 +1,2 @@
+pattern=$1
+grep -n "$pattern" $2 | cut -d : -f 1

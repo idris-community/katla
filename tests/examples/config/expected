@@ -1,0 +1,38 @@
+\usepackage{fancyvrb}
+\usepackage[x11names]{xcolor}
+
+\newcommand{\Katla}                [1]{\VerbatimInput[commandchars=\\\{\}]{#1}}
+\newcommand{\IdrisHlightFont}         {\ttfamily}
+\newcommand{\IdrisHlightStyleData}    {\sffamily}
+\newcommand{\IdrisHlightStyleType}    {\slshape}
+\newcommand{\IdrisHlightStyleBound}   {\itshape}
+\newcommand{\IdrisHlightStyleFunction}{}
+\newcommand{\IdrisHlightStyleKeyword} {\bfseries}
+\newcommand{\IdrisHlightStyleImplicit}{\itshape}
+\newcommand{\IdrisHlightStyleComment} {\itshape}
+\newcommand{\IdrisHlightStyleHole}    {\mdseries}
+
+\newcommand{\IdrisHlightColourData}    {Snow4}
+\newcommand{\IdrisHlightColourType}    {Azure4}
+\newcommand{\IdrisHlightColourBound}   {black}
+\newcommand{\IdrisHlightColourFunction}{black}
+\newcommand{\IdrisHlightColourKeyword} {Azure4}
+\newcommand{\IdrisHlightColourImplicit}{black}
+\newcommand{\IdrisHlightColourComment} {lightgrey}
+\newcommand{\IdrisHlightColourHole}    {black}
+
+\newcommand{\IdrisHole}[1]{{%
+    \colorbox{\IdrisHlightColourHole}{%
+      \IdrisHlightStyleHole\IdrisHlightFont%
+      #1}}}
+
+\newcommand{\RawIdrisHighlight}[3]{{\textcolor{#1}{#2\IdrisHlightFont#3}}}
+
+\newcommand{\IdrisData}[1]{\RawIdrisHighlight{\IdrisHlightColourData}{\IdrisHlightStyleData}{#1}}
+\newcommand{\IdrisType}[1]{\RawIdrisHighlight{\IdrisHlightColourType}{\IdrisHlightStyleType}{#1}}
+\newcommand{\IdrisBound}[1]{\RawIdrisHighlight{\IdrisHlightColourBound}{\IdrisHlightStyleBound}{#1}}
+\newcommand{\IdrisFunction}[1]{\RawIdrisHighlight{\IdrisHlightColourFunction}{\IdrisHlightStyleFunction}{#1}}
+\newcommand{\IdrisKeyword}[1]{\RawIdrisHighlight{\IdrisHlightColourKeyword}{\IdrisHlightStyleKeyword}{#1}}
+\newcommand{\IdrisImplicit}[1]{\RawIdrisHighlight{\IdrisHlightColourImplicit}{\IdrisHlightStyleImplicit}{#1}}
+\newcommand{\IdrisComment}[1]{\RawIdrisHighlight{\IdrisHlightColourComment}{\IdrisHlightStyleComment}{#1}}
+Expected: directly writing to file gives the same results

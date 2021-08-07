@@ -69,14 +69,14 @@ katlaExec =
               (Just src) (Just md) (Just output)
       Just [name, src, md, output, offset, before, after] =>
         katla (Just $ Macro (name, Just $ MkListingRange
-                                    { offset = cast offset
+                                    { offset = cast offset - 1
                                     , before = cast before
                                     , after  = cast after}))
               Nothing
               (Just src) (Just md) (Just output)
       Just [name, src, md, offset, before, after] =>
         katla (Just $ Macro (name, Just $ MkListingRange
-                                    { offset = cast offset
+                                    { offset = cast offset - 1
                                     , before = cast before
                                     , after  = cast after}))
               Nothing

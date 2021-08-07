@@ -1,5 +1,9 @@
 # Katla: LaTeX code listing generator for Idris2
 
+Pre-alpha version. Interface might change as the command line
+interface generator library [Collie](https://github.com/ohad/collie)
+evolves.
+
 Dependencies:
 + Idris2 downstream of [PR#1335](https://github.com/idris-lang/Idris2/pull/1335)
 + [Installing](https://github.com/idris-lang/Idris2/blob/master/INSTALL.md#6-optional-installing-the-idris-2-api) the Idris 2 API
@@ -8,13 +12,12 @@ Dependencies:
   [Dhall](https://dhall-lang.org/) bindings
 
 # Demo
-`make temp/Example.pdf`
+See [example tests](./tests/examples).
 
 # PRs welcome!
 
 Wishlist:
 
 + Error handling
-+ Better support for incorporating into bigger documents by generating macros
 + Batch mode
 + Separate into a library + driver module (so we could write Idris programs that generate such sources)
