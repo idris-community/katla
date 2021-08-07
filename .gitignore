@@ -1,2 +1,6 @@
 build
-temp/Katla.tex
+tests/failures
+output
+*.aux
+*.log
+temp

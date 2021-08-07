@@ -12,29 +12,8 @@ import Data.String
 import Data.SnocList
 
 import Katla.Config
+import Katla.LaTeX
 
-escapeLatex : Char -> List Char
-escapeLatex '\\' = fastUnpack "\\textbackslash{}"
-escapeLatex '{'  = fastUnpack "\\{"
-escapeLatex '}'  = fastUnpack "\\}"
-escapeLatex x    = [x]
-
-annotate : Maybe Decoration -> String -> String
-annotate Nothing    s = s
-annotate (Just dec) s = apply (convert dec) s
-  where
-    convert : Decoration -> String
-    convert (Typ     ) = "IdrisType"
-    convert (Function) = "IdrisFunction"
-    convert (Data    ) = "IdrisData"
-    convert (Keyword ) = "IdrisKeyword"
-    convert (Bound   ) = "IdrisBound"
-
-    apply : String -> String -> String
-    apply f a = "\\\{f}{\{a}}"
-
-color : String -> String
-color x = "\\color{\{x}}"
 
 {- Relies on the fact that PosMap is an efficient mapping from position:
 
@@ -57,80 +36,93 @@ findDecoration pos@(row, col) posMap =
    []              => Nothing
    (d :: ds)       => Just $ pickSmallest (d ::: ds)
 
+toString : SnocList Char -> String
+toString sx = (fastPack $ sx <>> [])
+
+snocEscape : (outputChars : SnocList Char) -> (new : Char) -> SnocList Char
+snocEscape sx c = sx <>< (escapeLatex c)
+
+
+||| True if input starts with EOL
+isNotEndOfLine : List Char -> Maybe (Char, List Char)
+isNotEndOfLine []           = Nothing
+isNotEndOfLine ('\r' :: _ ) = Nothing
+isNotEndOfLine ('\n' :: _ ) = Nothing
+isNotEndOfLine (x    :: xs) = Just (x, xs)
+
+ship : (output : File) -> Maybe Decoration -> (outputChars : SnocList Char) -> IO ()
+ship output decor outputChars = when (isSnoc outputChars) $ do
+   let decorated = annotate decor (toString outputChars)
+   _ <- fPutStr output decorated
+   pure ()
+
+processLine : (output : File)
+           -> PosMap ASemanticDecoration
+           -> (currentDecor  : Maybe Decoration)
+           -> (currentPos    : (Int, Int))
+           -> (remainingLine : List Char)
+           -> (currentOutput : SnocList Char)
+           -> IO (Maybe Decoration, (Int, Int))
+processLine output posMap currentDecor currentPos@(currentRow, currentCol) cs currentOutput
+  = case isNotEndOfLine cs of
+      Nothing => do
+        let nextPos = (currentRow + 1, 0)
+        ship output currentDecor currentOutput
+        _ <- fPutStrLn output ""
+        pure (currentDecor, nextPos)
+      Just (c , rest) => do
+        let (currentRow, currentCol) = currentPos
+            nextPos = (currentRow, currentCol + 1)
+            decor   = findDecoration currentPos posMap
+        if decor == currentDecor
+         then processLine output posMap currentDecor nextPos rest (snocEscape currentOutput c)
+         else do ship output currentDecor currentOutput
+                 processLine output posMap decor nextPos rest (snocEscape [<] c)
+
+engineWithDecor : (input, output : File)
+       -> PosMap ASemanticDecoration
+       -> Maybe Decoration -> (Int, Int) -> IO ()
+engineWithDecor input output posMap currentDecor currentPos
+  = when (not !(fEOF input)) $ do
+      Right str <- fGetLine input
+        | Left err => pure ()
+      (nextDecor, nextPos) <- processLine output posMap currentDecor currentPos
+                              (fastUnpack str) [<]
+      engineWithDecor input output posMap nextDecor nextPos
+
+public export
+record ListingRange where
+  constructor MkListingRange
+  offset, before, after : Int
+
+(.startRow) : ListingRange -> Int
+range.startRow = range.offset - range.before
+
+(.endRow) : ListingRange -> Int
+range.endRow = range.offset + range.after
+
+engineWithRange : (input, output : File)
+       -> PosMap ASemanticDecoration -> ListingRange
+       -> Maybe Decoration -> (Int, Int) -> IO ()
+engineWithRange input output posMap rowRange currentDecor currentPos
+  = when (not !(fEOF input)) $ do
+      Right str <- fGetLine input
+        | Left err => pure ()
+      (nextDecor, nextPos) <-(
+        if rowRange.startRow <= (fst currentPos) && (fst currentPos) <= rowRange.endRow
+        then processLine output posMap currentDecor currentPos
+                                (fastUnpack str) [<]
+        else pure (Nothing, (fst currentPos + 1, 0)))
+      engineWithRange input output posMap  rowRange nextDecor nextPos
+
+
 export
 engine : (input, output : File)
        -> PosMap ASemanticDecoration
        -> (Int, Int)
        -> IO ()
-engine input output posMap = engine Nothing
-  where
-    toString : SnocList Char -> String
-    toString sx = (fastPack $ sx <>> [])
+engine input output posMap = engineWithDecor input output posMap Nothing
 
-    snocEscape : (outputChars : SnocList Char) -> (new : Char) -> SnocList Char
-    snocEscape sx c = sx <>< (escapeLatex c)
-
-    ||| True if input starts with EOL
-    isNotEndOfLine : List Char -> Maybe (Char, List Char)
-    isNotEndOfLine []           = Nothing
-    isNotEndOfLine ('\r' :: _ ) = Nothing
-    isNotEndOfLine ('\n' :: _ ) = Nothing
-    isNotEndOfLine (x    :: xs) = Just (x, xs)
-
-    ship : Maybe Decoration -> (outputChars : SnocList Char) -> IO ()
-    ship decor outputChars = when (isSnoc outputChars) $ do
-      let decorated = annotate decor (toString outputChars)
-      _ <- fPutStr output decorated
-      pure ()
-
-    processLine : (currentDecor  : Maybe Decoration)
-               -> (currentPos    : (Int, Int))
-               -> (remainingLine : List Char)
-               -> (currentOutput : SnocList Char)
-               -> IO (Maybe Decoration, (Int, Int))
-    processLine currentDecor currentPos@(currentRow, currentCol) cs currentOutput
-      = case isNotEndOfLine cs of
-          Nothing => do
-            let nextPos = (currentRow + 1, 0)
-            ship currentDecor currentOutput
-            _ <- fPutStrLn output ""
-            pure (currentDecor, nextPos)
-          Just (c , rest) => do
-            let (currentRow, currentCol) = currentPos
-                nextPos = (currentRow, currentCol + 1)
-                decor   = findDecoration currentPos posMap
-            if decor == currentDecor
-             then processLine currentDecor nextPos rest (snocEscape currentOutput c)
-             else do ship currentDecor currentOutput
-                     processLine decor nextPos rest (snocEscape [<] c)
-
-    engine : Maybe Decoration -> (Int, Int) -> IO ()
-    engine currentDecor currentPos
-      = when (not !(fEOF input)) $ do
-          Right str <- fGetLine input
-            | Left err => pure ()
-          (nextDecor, nextPos) <- processLine currentDecor currentPos (fastUnpack str) [<]
-          engine nextDecor nextPos
-
-standalonePre : Config -> String
-standalonePre config = """
-  \\documentclass{article}
-
-  \\usepackage{fancyvrb}
-  \\usepackage[x11names]{xcolor}
-
-  \{laTeXHeader config}
-
-  \\begin{document}
-  %\\VerbatimInput[commandchars=\\\\\\{\\}]{content}
-  \\begin{Verbatim}[commandchars=\\\\\\{\\}]
-  """
-
-standalonePost : String
-standalonePost = """
-  \\end{Verbatim}
-  \\end{document}
-  """
 
 record FileHandles where
   constructor MkHandles
@@ -170,17 +162,11 @@ setupFiles mconfig filename metadata moutput = do
     }
 
 public export
-data Snippet = Raw | Macro String
+data Snippet = Raw (Maybe ListingRange) | Macro (String, Maybe ListingRange)
 
-makeMacroPre : String -> String
-makeMacroPre name = """
-  \\newcommand\\\{name}{\\UseVerbatim{\{name}}}
-  \\begin{SaveVerbatim}[commandchars=\\\\\\{\\}]{\{name}}
-  """
-makeMacroPost : String
-makeMacroPost = """
-  \\end{SaveVerbatim}
-  """
+(.listing) : Snippet -> Maybe ListingRange
+(Raw mrange       ).listing = mrange
+(Macro (_, mrange)).listing = mrange
 
 export
 katla : (snippet : Maybe Snippet) -> (mconfig : Maybe String) ->
@@ -205,16 +191,20 @@ katla (Just snippet) mconfig (Just filename) (Just metadata) moutput = do
   Right files <- setupFiles mconfig filename metadata moutput
   | Left ReportedError => pure ()
   case snippet of
-    Raw => pure ()
-    Macro name => do -- TODO: validate macro name, perhaps when parsing
+    Raw _ => pure ()
+    Macro (name, mrange) => do -- TODO: validate macro name, perhaps when parsing
       Right _ <- fPutStrLn files.output (makeMacroPre name)
       | Left err => putStrLn
         "Error while generating macro name \{name}: \{show err}"
       pure ()
-  engine files.source files.output files.metadata (0,0)
+  case snippet.listing of
+    Nothing    => engine          files.source files.output files.metadata
+                                         (0,0)
+    Just range => engineWithRange files.source files.output files.metadata
+                                  range Nothing (0,0)
   case snippet of
-    Raw => pure ()
-    Macro name => do
+    Raw _ => pure ()
+    Macro (name, mrange) => do
       Right _ <- fPutStrLn files.output makeMacroPost
       | Left err => putStrLn
         "Error while generating macro name \{name}: \{show err}"

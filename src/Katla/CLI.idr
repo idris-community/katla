@@ -3,6 +3,7 @@ module Katla.CLI
 import public Collie
 
 import Katla.Config
+import Katla.LaTeX
 import Katla.Engine
 
 %default covering
@@ -46,7 +47,7 @@ katlaCmd = MkCommand
 
 rawSnippet : Bool -> Maybe Snippet
 rawSnippet False = Nothing
-rawSnippet True  = Just Raw
+rawSnippet True  = Just (Raw Nothing)
 
 export
 katlaExec : CLI.katlaCmd ~~> IO ()
@@ -63,11 +64,26 @@ katlaExec =
        _ => putStrLn katlaCmd.usage
   , "macro"   ::= [\parsed => case parsed.arguments of
       Just [name, src, md, output] =>
-        katla (Just $ Macro name)
+        katla (Just $ Macro (name, Nothing))
               Nothing
               (Just src) (Just md) (Just output)
+      Just [name, src, md, output, offset, before, after] =>
+        katla (Just $ Macro (name, Just $ MkListingRange
+                                    { offset = cast offset - 1
+                                    , before = cast before
+                                    , after  = cast after}))
+              Nothing
+              (Just src) (Just md) (Just output)
+      Just [name, src, md, offset, before, after] =>
+        katla (Just $ Macro (name, Just $ MkListingRange
+                                    { offset = cast offset - 1
+                                    , before = cast before
+                                    , after  = cast after}))
+              Nothing
+              (Just src) (Just md) Nothing
+
       Just [name, src, md] =>
-        katla (Just $ Macro name)
+        katla (Just $ Macro (name, Nothing))
               Nothing
               (Just src) (Just md) Nothing
       _ => putStrLn katlaCmd.usage

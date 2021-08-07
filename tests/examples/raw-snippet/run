@@ -1,0 +1,15 @@
+rm -rf temp build
+idris2 -c Rainbow.idr
+
+mkdir temp
+
+# Test Katla
+$1 --snippet ./Rainbow.idr ./build/ttc/Rainbow.ttm | tee temp/rainbow-listing.tex
+$1 --snippet ./Rainbow.idr ./build/ttc/Rainbow.ttm temp/rainbow-listing-direct.tex
+
+# Test generated pdfs
+cp rainbow.tex katla-preamble.tex temp/
+sh ../../scripts/pdfgen temp rainbow
+sh ../../scripts/filecmp temp/rainbow-listing.tex \
+                         temp/rainbow-listing-direct.tex \
+                         "directly writing to file"
