@@ -39,7 +39,7 @@ laTeXHeader cfg =  """
 \\usepackage{fancyvrb}
 \\usepackage[x11names]{xcolor}
 
-\\newcommand{\\Katla}                [1]{\\VerbatimInput[commandchars=\\\\\\{\\}]{#1}}
+\\newcommand{\\Katla}                [2][]{\\VerbatimInput[commandchars=\\\\\\{\\}#1]{#2}}
 \\newcommand{\\IdrisHlightFont}         {\{cfg.font}}
 \\newcommand{\\IdrisHlightStyleData}    {\{cfg.datacons.style}}
 \\newcommand{\\IdrisHlightStyleType}    {\{cfg.typecons.style}}
@@ -98,7 +98,7 @@ standalonePost = """
 export
 makeMacroPre : String -> String
 makeMacroPre name = """
-  \\newcommand\\\{name}{\\UseVerbatim{\{name}}}
+  \\newcommand\\\{name}[1][]{\\UseVerbatim[#1]{\{name}}}
   \\begin{SaveVerbatim}[commandchars=\\\\\\{\\}]{\{name}}
   """
 
