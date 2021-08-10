@@ -153,7 +153,7 @@ preambleExec moutput configFile = do
   closeFile file
 
 export
-preamble : (ParsedCommand Prelude.id Maybe _ LaTeX.preambleCmd) -> IO ()
+preamble : (ParsedCommand _ LaTeX.preambleCmd) -> IO ()
 preamble parsed = preambleExec parsed.arguments (parsed.modifiers.project "--config")
 
 export
@@ -172,5 +172,5 @@ initExec moutput = do
   closeFile file
 
 export
-init : (ParsedCommand Prelude.id Maybe _ LaTeX.initCmd) -> IO ()
+init : (ParsedCommand _ LaTeX.initCmd) -> IO ()
 init parsed = initExec parsed.arguments
