@@ -104,8 +104,8 @@ katlaExec =
         katla (Just $ Macro (name, True, Just (RangeByOffsetAndCols
                                     { offset = cast offset - 1
                                     , after  = cast line
-                                    , startCol  = cast startCol
-                                    , endCol    = cast endCol + 1
+                                    , startCol  = cast startCol - 1
+                                    , endCol    = cast endCol
                                     })))
               Nothing
               (Just src) (Just md) (Just output)
@@ -113,8 +113,8 @@ katlaExec =
         katla (Just $ Macro (name, True, Just (RangeByOffsetAndCols
                                     { offset = cast offset - 1
                                     , after  = cast line
-                                    , startCol  = cast startCol
-                                    , endCol    = cast endCol + 1
+                                    , startCol  = cast startCol - 1
+                                    , endCol    = cast endCol
                                     })))
               Nothing
               (Just src) (Just md) Nothing

@@ -14,7 +14,7 @@ $1 macro BelieveMe ./Rainbow.idr ./build/ttc/Rainbow.ttm \
      $(sh ../../scripts/grepline "m :" ./Rainbow.idr) 0 1 | tee >> temp/rainbow-macros.tex
 
 $1 macro inline mvar ./Rainbow.idr ./build/ttc/Rainbow.ttm \
-     $(sh ../../scripts/grepline "m :" ./Rainbow.idr) 0 0 0 | tee >> temp/rainbow-macros.tex
+     $(sh ../../scripts/grepline "m :" ./Rainbow.idr) 0 1 1 | tee >> temp/rainbow-macros.tex
 
 $1 macro inline Cons ./Rainbow.idr ./build/ttc/Rainbow.ttm \
      $(sh ../../scripts/grepline "data List0 : Type where" ./Rainbow.idr) \
