@@ -74,6 +74,11 @@ laTeXHeader cfg =  """
 \\newcommand{\\IdrisImplicit}[1]{\\RawIdrisHighlight{\\IdrisHlightColourImplicit}{\\IdrisHlightStyleImplicit}{#1}}
 \\newcommand{\\IdrisComment}[1]{\\RawIdrisHighlight{\\IdrisHlightColourComment}{\\IdrisHlightStyleComment}{#1}}
 
+% Bugfix in fancyvrb to allow inline saved listings
+\\makeatletter
+\\let\\FV@ProcessLine\\relax
+\\makeatother
+
 """
 
 
@@ -105,6 +110,19 @@ makeMacroPre name = """
 export
 makeMacroPost : String
 makeMacroPost = """
+  \\end{SaveVerbatim}
+  """
+
+export
+makeInlineMacroPre : String -> String
+makeInlineMacroPre name = """
+  \\newcommand\\\{name}[1][]{\\UseVerb[#1]{\{name}}}
+  \\begin{SaveVerbatim}[commandchars=\\\\\\{\\}]{\{name}}
+  """
+
+export
+makeInlineMacroPost : String
+makeInlineMacroPost = """
   \\end{SaveVerbatim}
   """
 

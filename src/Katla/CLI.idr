@@ -9,12 +9,23 @@ import Katla.Engine
 %default covering
 
 export
+inlineCmd : Command "inline"
+inlineCmd = MkCommand
+  { description = """
+      Generate a macro that typesets an inline code snippet
+      """
+  , subcommands = []
+  , modifiers = []
+  , arguments = lotsOf filePath
+  }
+
+export
 macroCmd : Command "macro"
 macroCmd = MkCommand
   { description = """
       Generate a macro that typesets the code snippet
       """
-  , subcommands = []
+  , subcommands = ["inline" ::= inlineCmd]
   , modifiers = []
   , arguments = lotsOf filePath
   }
@@ -62,20 +73,21 @@ katlaExec =
                (parsed.modifiers.project "--config")
                (Just src) (Just md) Nothing
        _ => putStrLn katlaCmd.usage
-  , "macro"   ::= [\parsed => case parsed.arguments of
+  , "macro"   ::=
+    [\parsed => case parsed.arguments of
       Just [name, src, md, output] =>
-        katla (Just $ Macro (name, Nothing))
+        katla (Just $ Macro (name, False, Nothing))
               Nothing
               (Just src) (Just md) (Just output)
       Just [name, src, md, output, offset, before, after] =>
-        katla (Just $ Macro (name, Just $ MkListingRange
+        katla (Just $ Macro (name, False, Just $ RowRangeByOffset
                                     { offset = cast offset - 1
                                     , before = cast before
                                     , after  = cast after}))
               Nothing
               (Just src) (Just md) (Just output)
       Just [name, src, md, offset, before, after] =>
-        katla (Just $ Macro (name, Just $ MkListingRange
+        katla (Just $ Macro (name, False, Just $ RowRangeByOffset
                                     { offset = cast offset - 1
                                     , before = cast before
                                     , after  = cast after}))
@@ -83,11 +95,32 @@ katlaExec =
               (Just src) (Just md) Nothing
 
       Just [name, src, md] =>
-        katla (Just $ Macro (name, Nothing))
+        katla (Just $ Macro (name, False, Nothing))
+              Nothing
+              (Just src) (Just md) Nothing
+      _ => putStrLn katlaCmd.usage
+    , "inline" ::= [\parsed => case parsed.arguments of
+      Just [name, src, md, output, offset, line, startCol, endCol] =>
+        katla (Just $ Macro (name, True, Just (RangeByOffsetAndCols
+                                    { offset = cast offset - 1
+                                    , after  = cast line
+                                    , startCol  = cast startCol
+                                    , endCol    = cast endCol + 1
+                                    })))
+              Nothing
+              (Just src) (Just md) (Just output)
+      Just [name, src, md,         offset, line, startCol, endCol] => do
+        katla (Just $ Macro (name, True, Just (RangeByOffsetAndCols
+                                    { offset = cast offset - 1
+                                    , after  = cast line
+                                    , startCol  = cast startCol
+                                    , endCol    = cast endCol + 1
+                                    })))
               Nothing
               (Just src) (Just md) Nothing
       _ => putStrLn katlaCmd.usage
       ]
+    ]
   , "--help"  ::= [const $ putStrLn katlaCmd.usage]
   , "preamble" ::= [preamble]
   , "init"     ::= [init]

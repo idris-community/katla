@@ -13,6 +13,14 @@ $1 macro Rainbow ./Rainbow.idr ./build/ttc/Rainbow.ttm \
 $1 macro BelieveMe ./Rainbow.idr ./build/ttc/Rainbow.ttm \
      $(sh ../../scripts/grepline "m :" ./Rainbow.idr) 0 1 | tee >> temp/rainbow-macros.tex
 
+$1 macro inline mvar ./Rainbow.idr ./build/ttc/Rainbow.ttm \
+     $(sh ../../scripts/grepline "m :" ./Rainbow.idr) 0 0 0 | tee >> temp/rainbow-macros.tex
+
+$1 macro inline Cons ./Rainbow.idr ./build/ttc/Rainbow.ttm \
+     $(sh ../../scripts/grepline "data List0 : Type where" ./Rainbow.idr) \
+     2 4 29 | tee >> temp/rainbow-macros.tex
+
+
 # Test generated pdfs
 cp rainbow.tex katla-preamble.tex temp/
 sh ../../scripts/pdfgen temp rainbow

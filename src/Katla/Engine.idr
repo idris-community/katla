@@ -60,24 +60,29 @@ processLine : (output : File)
            -> PosMap ASemanticDecoration
            -> (currentDecor  : Maybe Decoration)
            -> (currentPos    : (Int, Int))
+           -> (endPos : Maybe (Int, Int))
            -> (remainingLine : List Char)
            -> (currentOutput : SnocList Char)
            -> IO (Maybe Decoration, (Int, Int))
-processLine output posMap currentDecor currentPos@(currentRow, currentCol) cs currentOutput
-  = case isNotEndOfLine cs of
-      Nothing => do
+processLine output posMap currentDecor currentPos@(currentRow, currentCol) endPos cs currentOutput
+  = case (isNotEndOfLine cs, maybe True (currentPos <) endPos) of
+      (Nothing, _) => do
         let nextPos = (currentRow + 1, 0)
         ship output currentDecor currentOutput
         _ <- fPutStrLn output ""
         pure (currentDecor, nextPos)
-      Just (c , rest) => do
+      (Just _         , False) => do
+        ship output currentDecor currentOutput
+        _ <- fPutStrLn output ""
+        pure (currentDecor, currentPos)
+      (Just (c , rest), True) => do
         let (currentRow, currentCol) = currentPos
             nextPos = (currentRow, currentCol + 1)
             decor   = findDecoration currentPos posMap
         if decor == currentDecor
-         then processLine output posMap currentDecor nextPos rest (snocEscape currentOutput c)
+         then processLine output posMap currentDecor nextPos endPos rest (snocEscape currentOutput c)
          else do ship output currentDecor currentOutput
-                 processLine output posMap decor nextPos rest (snocEscape [<] c)
+                 processLine output posMap decor nextPos endPos rest (snocEscape [<] c)
 
 engineWithDecor : (input, output : File)
        -> PosMap ASemanticDecoration
@@ -86,20 +91,38 @@ engineWithDecor input output posMap currentDecor currentPos
   = when (not !(fEOF input)) $ do
       Right str <- fGetLine input
         | Left err => pure ()
-      (nextDecor, nextPos) <- processLine output posMap currentDecor currentPos
+      (nextDecor, nextPos) <- processLine output posMap currentDecor currentPos Nothing
                               (fastUnpack str) [<]
       engineWithDecor input output posMap nextDecor nextPos
 
-public export
+export
 record ListingRange where
   constructor MkListingRange
-  offset, before, after : Int
+  startRow, startCol,
+  endRow, endCol : Int
 
-(.startRow) : ListingRange -> Int
-range.startRow = range.offset - range.before
+export
+RowRangeByOffset : (offset, before, after : Int) -> ListingRange
+RowRangeByOffset offset before after = MkListingRange
+  { startRow = offset - before
+  , endRow = offset + after + 1
+  , startCol = 0
+  , endCol = 0}
 
-(.endRow) : ListingRange -> Int
-range.endRow = range.offset + range.after
+export
+RangeByOffsetAndCols : (offset, after,startCol,endCol : Int) -> ListingRange
+RangeByOffsetAndCols offset after startCol endCol =
+  let row = offset + after
+  in MkListingRange
+  { startRow = row
+  , startCol = startCol
+  , endRow   = row
+  , endCol   = endCol
+  }
+
+(.start),(.end) : ListingRange -> (Int, Int)
+range.start = (range.startRow, range.startCol)
+range.end   = (range.endRow, range.endCol)
 
 engineWithRange : (input, output : File)
        -> PosMap ASemanticDecoration -> ListingRange
@@ -108,12 +131,18 @@ engineWithRange input output posMap rowRange currentDecor currentPos
   = when (not !(fEOF input)) $ do
       Right str <- fGetLine input
         | Left err => pure ()
-      (nextDecor, nextPos) <-(
-        if rowRange.startRow <= (fst currentPos) && (fst currentPos) <= rowRange.endRow
-        then processLine output posMap currentDecor currentPos
-                                (fastUnpack str) [<]
-        else pure (Nothing, (fst currentPos + 1, 0)))
-      engineWithRange input output posMap  rowRange nextDecor nextPos
+      (nextDecor, nextPos) <- (
+         if rowRange.startRow <= fst currentPos && currentPos < rowRange.end
+         then let (decor, startPos, relevantLine) =
+                   if rowRange.startRow == fst currentPos
+                   then ( Nothing
+                        , (fst currentPos, rowRange.startCol)
+                        , drop (cast rowRange.startCol) (fastUnpack str))
+                   else (currentDecor, currentPos, fastUnpack str)
+              in processLine output posMap decor startPos (Just rowRange.end)
+                                    relevantLine [<]
+         else pure (Nothing, (fst currentPos + 1, 0)))
+      engineWithRange input output posMap rowRange nextDecor nextPos
 
 
 export
@@ -162,11 +191,11 @@ setupFiles mconfig filename metadata moutput = do
     }
 
 public export
-data Snippet = Raw (Maybe ListingRange) | Macro (String, Maybe ListingRange)
+data Snippet = Raw (Maybe ListingRange) | Macro (String, Bool, Maybe ListingRange)
 
 (.listing) : Snippet -> Maybe ListingRange
-(Raw mrange       ).listing = mrange
-(Macro (_, mrange)).listing = mrange
+(Raw mrange          ).listing = mrange
+(Macro (_, _, mrange)).listing = mrange
 
 export
 katla : (snippet : Maybe Snippet) -> (mconfig : Maybe String) ->
@@ -192,8 +221,9 @@ katla (Just snippet) mconfig (Just filename) (Just metadata) moutput = do
   | Left ReportedError => pure ()
   case snippet of
     Raw _ => pure ()
-    Macro (name, mrange) => do -- TODO: validate macro name, perhaps when parsing
-      Right _ <- fPutStrLn files.output (makeMacroPre name)
+    Macro (name, inline, mrange) => do -- TODO: validate macro name, perhaps when parsing
+      Right _ <- fPutStrLn files.output
+        ((ifThenElse inline makeInlineMacroPre makeMacroPre) name)
       | Left err => putStrLn
         "Error while generating macro name \{name}: \{show err}"
       pure ()
@@ -204,8 +234,8 @@ katla (Just snippet) mconfig (Just filename) (Just metadata) moutput = do
                                   range Nothing (0,0)
   case snippet of
     Raw _ => pure ()
-    Macro (name, mrange) => do
-      Right _ <- fPutStrLn files.output makeMacroPost
+    Macro (name, inline, mrange) => do
+      Right _ <- fPutStrLn files.output $ ifThenElse inline makeInlineMacroPost makeMacroPost
       | Left err => putStrLn
         "Error while generating macro name \{name}: \{show err}"
       pure ()

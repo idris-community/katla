@@ -1,4 +1,7 @@
-\newcommand\Katla[1]{\VerbatimInput[commandchars=\\\{\}]{#1}}
+\usepackage{fancyvrb}
+\usepackage[x11names]{xcolor}
+
+\newcommand{\Katla}                [2][]{\VerbatimInput[commandchars=\\\{\}#1]{#2}}
 \newcommand{\IdrisHlightFont}         {\ttfamily}
 \newcommand{\IdrisHlightStyleData}    {}
 \newcommand{\IdrisHlightStyleType}    {}
@@ -19,7 +22,7 @@
 \newcommand{\IdrisHlightColourHole}    {yellow}
 
 \newcommand{\IdrisHole}[1]{{%
-    \colorbox{yellow}{%
+    \colorbox{\IdrisHlightColourHole}{%
       \IdrisHlightStyleHole\IdrisHlightFont%
       #1}}}
 
@@ -32,3 +35,8 @@
 \newcommand{\IdrisKeyword}[1]{\RawIdrisHighlight{\IdrisHlightColourKeyword}{\IdrisHlightStyleKeyword}{#1}}
 \newcommand{\IdrisImplicit}[1]{\RawIdrisHighlight{\IdrisHlightColourImplicit}{\IdrisHlightStyleImplicit}{#1}}
 \newcommand{\IdrisComment}[1]{\RawIdrisHighlight{\IdrisHlightColourComment}{\IdrisHlightStyleComment}{#1}}
+
+% Bugfix in fancyvrb to allow inline saved listings
+\makeatletter
+\let\FV@ProcessLine\relax
+\makeatother

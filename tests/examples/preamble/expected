@@ -35,4 +35,9 @@
 \newcommand{\IdrisKeyword}[1]{\RawIdrisHighlight{\IdrisHlightColourKeyword}{\IdrisHlightStyleKeyword}{#1}}
 \newcommand{\IdrisImplicit}[1]{\RawIdrisHighlight{\IdrisHlightColourImplicit}{\IdrisHlightStyleImplicit}{#1}}
 \newcommand{\IdrisComment}[1]{\RawIdrisHighlight{\IdrisHlightColourComment}{\IdrisHlightStyleComment}{#1}}
+
+% Bugfix in fancyvrb to allow inline saved listings
+\makeatletter
+\let\FV@ProcessLine\relax
+\makeatother
 Expected: directly writing to file gives the same results
