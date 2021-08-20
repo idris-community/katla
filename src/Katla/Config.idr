@@ -36,7 +36,7 @@ namespace Cat
         restPadding = prefixLength + 2
     in """
     \{prefixString}\{replicate initPadding ' '  } = { style  = \{show cat.style }
-    \{indent restPadding " = "}, colour = \{show cat.colour}}
+    \{indent restPadding "   "}, colour = \{show cat.colour}}
     """
 
 export

@@ -1,0 +1,31 @@
+namespace L0
+  \IdrisKeyword{public} \IdrisKeyword{export}
+  \IdrisKeyword{data} \IdrisType{List0} \IdrisKeyword{:} \IdrisType{Type}
+
+
+namespace L1
+  \IdrisKeyword{public} \IdrisKeyword{export}
+  \IdrisKeyword{data} \IdrisType{List1} \IdrisKeyword{:} \IdrisType{Type} \IdrisKeyword{where}
+    \IdrisData{Nil} \IdrisKeyword{:} \IdrisType{List1}
+    \IdrisData{Cons1} \IdrisKeyword{:} \IdrisType{Nat} \IdrisKeyword{->} \IdrisType{List0} \IdrisKeyword{->} \IdrisType{List1}
+
+  \IdrisKeyword{public} \IdrisKeyword{export}
+  \IdrisFunction{(::)} \IdrisKeyword{:} \IdrisType{Nat} \IdrisKeyword{->} \IdrisType{List0} \IdrisKeyword{->} \IdrisType{List1}
+  \IdrisFunction{(::)} \IdrisKeyword{=} \IdrisData{Cons1}
+
+namespace L2
+  \IdrisKeyword{public} \IdrisKeyword{export}
+  \IdrisKeyword{data} \IdrisType{(::)} \IdrisKeyword{:} \IdrisType{Nat} \IdrisKeyword{->} \IdrisType{List0} \IdrisKeyword{->} \IdrisType{Type} \IdrisKeyword{where}
+
+namespace L0
+  \IdrisKeyword{public} \IdrisKeyword{export}
+  \IdrisKeyword{data} \IdrisType{List0} \IdrisKeyword{:} \IdrisType{Type} \IdrisKeyword{where}
+    \IdrisData{Nil} \IdrisKeyword{:} \IdrisType{List0}
+    \IdrisData{(::)} \IdrisKeyword{:} \IdrisType{Nat} \IdrisKeyword{->}\IdrisType{Type} \IdrisKeyword{->} \IdrisType{List0}
+
+\IdrisFunction{m} \IdrisKeyword{:} \IdrisType{Nat}
+\IdrisFunction{m} \IdrisKeyword{=} \IdrisFunction{believe_me} \IdrisData{%MkWorld}
+
+\IdrisFunction{Rainbow} \IdrisKeyword{:} \IdrisType{Nat} \IdrisKeyword{->} \IdrisType{Type}
+\IdrisFunction{Rainbow} \IdrisBound{n} \IdrisKeyword{=}  \IdrisType{[} \IdrisBound{n} \IdrisData{,} \IdrisFunction{m} \IdrisType{,} \IdrisBound{n} \IdrisData{]}
+

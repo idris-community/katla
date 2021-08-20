@@ -4,3 +4,4 @@ output
 *.aux
 *.log
 temp
+depends
