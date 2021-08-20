@@ -11,6 +11,7 @@ tests = MkTestPool "Examples using Katla" [] Nothing
   , "preamble"
   , "config"
   , "macros"
+  , "init"
   ]
 
 main : IO ()

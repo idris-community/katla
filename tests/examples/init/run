@@ -1,0 +1,14 @@
+rm -rf temp
+mkdir temp
+# Test Katla
+$1 init | tee temp/generated.dhall
+$1 preamble --config ./temp/generated.dhall | tee temp/katla-preamble.tex
+$1 preamble --config ./temp/generated.dhall temp/katla-preamble-direct.tex
+
+
+# Test generated pdfs
+cp rainbow.tex rainbow-listing.tex temp/
+sh ../../scripts/pdfgen temp rainbow
+sh ../../scripts/filecmp temp/katla-preamble.tex \
+                         temp/katla-preamble-direct.tex \
+                         "directly writing to file"
