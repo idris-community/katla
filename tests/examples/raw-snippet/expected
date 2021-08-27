@@ -1,10 +1,10 @@
 1/1: Building Rainbow (Rainbow.idr)
-namespace L0
+namespace \IdrisNamespace{L0}
   \IdrisKeyword{public} \IdrisKeyword{export}
   \IdrisKeyword{data} \IdrisType{List0} \IdrisKeyword{:} \IdrisType{Type}
 
 
-namespace L1
+namespace \IdrisNamespace{L1}
   \IdrisKeyword{public} \IdrisKeyword{export}
   \IdrisKeyword{data} \IdrisType{List1} \IdrisKeyword{:} \IdrisType{Type} \IdrisKeyword{where}
     \IdrisData{Nil} \IdrisKeyword{:} \IdrisType{List1}
@@ -14,11 +14,11 @@ namespace L1
   \IdrisFunction{(::)} \IdrisKeyword{:} \IdrisType{Nat} \IdrisKeyword{->} \IdrisType{List0} \IdrisKeyword{->} \IdrisType{List1}
   \IdrisFunction{(::)} \IdrisKeyword{=} \IdrisData{Cons1}
 
-namespace L2
+namespace \IdrisNamespace{L2}
   \IdrisKeyword{public} \IdrisKeyword{export}
   \IdrisKeyword{data} \IdrisType{(::)} \IdrisKeyword{:} \IdrisType{Nat} \IdrisKeyword{->} \IdrisType{List0} \IdrisKeyword{->} \IdrisType{Type} \IdrisKeyword{where}
 
-namespace L0
+namespace \IdrisNamespace{L0}
   \IdrisKeyword{public} \IdrisKeyword{export}
   \IdrisKeyword{data} \IdrisType{List0} \IdrisKeyword{:} \IdrisType{Type} \IdrisKeyword{where}
     \IdrisData{Nil} \IdrisKeyword{:} \IdrisType{List0}

@@ -26,6 +26,9 @@ record Config where
   keyword  : Category
   comment  : Category
   hole     : Category
+  namespce : Category
+  postulte : Category
+  aModule  : Category
 
 namespace Cat
   export
@@ -50,6 +53,9 @@ conf.toString = """
 \{conf.keyword .toString ", keyword"  {prefixLength = length "datacons"}}
 \{conf.comment .toString ", comment"  {prefixLength = length "datacons"}}
 \{conf.hole    .toString ", hole"     {prefixLength = length "datacons"}}
+\{conf.namespce.toString ", namespce" {prefixLength = length "datacons"}}
+\{conf.postulte.toString ", postulte" {prefixLength = length "datacons"}}
+\{conf.aModule .toString ", aModule"  {prefixLength = length "datacons"}}
 }
 """
 
@@ -85,6 +91,18 @@ defaultConfig = MkConfig
   , hole = MkCategory
     { style  = #"\bfseries"#
     , colour = "yellow"
+    }
+  , namespce = MkCategory
+    { style = #"\itshape"#
+    , colour = "black"
+    }
+  , postulte = MkCategory
+    { style = #"\bfseries"#
+    , colour = "DarkOrchid3"
+    }
+  , aModule  = MkCategory
+    { style = #"\itshape"#
+    , colour = "black"
     }
   }
 %runElab (deriveFromDhall Record `{ Category })
