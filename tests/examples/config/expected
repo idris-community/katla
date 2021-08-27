@@ -3,30 +3,36 @@
 
 \newcommand{\Katla}                [2][]{\VerbatimInput[commandchars=\\\{\}#1]{#2}}
 \newcommand{\IdrisHlightFont}         {\ttfamily}
-\newcommand{\IdrisHlightStyleData}    {\sffamily}
-\newcommand{\IdrisHlightStyleType}    {\slshape}
-\newcommand{\IdrisHlightStyleBound}   {\itshape}
+\newcommand{\IdrisHlightStyleData}    {}
+\newcommand{\IdrisHlightStyleType}    {}
+\newcommand{\IdrisHlightStyleBound}   {}
 \newcommand{\IdrisHlightStyleFunction}{}
 \newcommand{\IdrisHlightStyleKeyword} {\bfseries}
-\newcommand{\IdrisHlightStyleImplicit}{\itshape}
+\newcommand{\IdrisHlightStyleImplicit}{}
 \newcommand{\IdrisHlightStyleComment} {\itshape}
-\newcommand{\IdrisHlightStyleHole}    {\mdseries}
+\newcommand{\IdrisHlightStyleHole}    {\bfseries}
+\newcommand{\IdrisHlightStyleNamespace}{\itshape}
+\newcommand{\IdrisHlightStylePostulate}{\bfseries}
+\newcommand{\IdrisHlightStyleModule}   {\itshape}
 
-\newcommand{\IdrisHlightColourData}    {Snow4}
-\newcommand{\IdrisHlightColourType}    {Azure4}
-\newcommand{\IdrisHlightColourBound}   {black}
-\newcommand{\IdrisHlightColourFunction}{black}
-\newcommand{\IdrisHlightColourKeyword} {Azure4}
-\newcommand{\IdrisHlightColourImplicit}{black}
-\newcommand{\IdrisHlightColourComment} {lightgrey}
-\newcommand{\IdrisHlightColourHole}    {black}
+\newcommand{\IdrisHlightColourData}    {cb-burgundy}
+\newcommand{\IdrisHlightColourType}    {cb-blue}
+\newcommand{\IdrisHlightColourBound}   {cb-rose}
+\newcommand{\IdrisHlightColourFunction}{cb-green-sea}
+\newcommand{\IdrisHlightColourKeyword} {black}
+\newcommand{\IdrisHlightColourImplicit}{cb-rose}
+\newcommand{\IdrisHlightColourComment} {cb-clay}
+\newcommand{\IdrisHlightColourHole}    {cb-yellow}
+\newcommand{\IdrisHlightColourNamespace}{black}
+\newcommand{\IdrisHlightColourPostulate}{cb-green-sea}
+\newcommand{\IdrisHlightColourModule}   {black}
 
 \newcommand{\IdrisHole}[1]{{%
     \colorbox{\IdrisHlightColourHole}{%
       \IdrisHlightStyleHole\IdrisHlightFont%
       #1}}}
 
-\newcommand{\RawIdrisHighlight}[3]{{\textcolor{#1}{#2\IdrisHlightFont#3}}}
+\newcommand{\RawIdrisHighlight}[3]{{\textcolor{#1}{\IdrisHlightFont#2{#3}}}}
 
 \newcommand{\IdrisData}[1]{\RawIdrisHighlight{\IdrisHlightColourData}{\IdrisHlightStyleData}{#1}}
 \newcommand{\IdrisType}[1]{\RawIdrisHighlight{\IdrisHlightColourType}{\IdrisHlightStyleType}{#1}}
@@ -35,6 +41,9 @@
 \newcommand{\IdrisKeyword}[1]{\RawIdrisHighlight{\IdrisHlightColourKeyword}{\IdrisHlightStyleKeyword}{#1}}
 \newcommand{\IdrisImplicit}[1]{\RawIdrisHighlight{\IdrisHlightColourImplicit}{\IdrisHlightStyleImplicit}{#1}}
 \newcommand{\IdrisComment}[1]{\RawIdrisHighlight{\IdrisHlightColourComment}{\IdrisHlightStyleComment}{#1}}
+\newcommand{\IdrisNamespace}[1]{\RawIdrisHighlight{\IdrisHlightColourNamespace}{\IdrisHlightStyleNamespace}{#1}}
+\newcommand{\IdrisPostulate}[1]{\RawIdrisHighlight{\IdrisHlightColourPostulate}{\IdrisHlightStylePostulate}{#1}}
+\newcommand{\IdrisModule}[1]{\RawIdrisHighlight{\IdrisHlightColourModule}{\IdrisHlightStyleModule}{#1}}
 
 % Bugfix in fancyvrb to allow inline saved listings
 \makeatletter

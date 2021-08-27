@@ -13,6 +13,12 @@
              , colour = "grey"}
 , hole     = { style  = "\\bfseries"
              , colour = "yellow"}
+, namespce = { style  = "\\itshape"
+             , colour = "black"}
+, postulte = { style  = "\\bfseries"
+             , colour = "DarkOrchid3"}
+, aModule  = { style  = "\\itshape"
+             , colour = "black"}
 }
 \usepackage{fancyvrb}
 \usepackage[x11names]{xcolor}
@@ -27,6 +33,9 @@
 \newcommand{\IdrisHlightStyleImplicit}{}
 \newcommand{\IdrisHlightStyleComment} {\itshape}
 \newcommand{\IdrisHlightStyleHole}    {\bfseries}
+\newcommand{\IdrisHlightStyleNamespace}{\itshape}
+\newcommand{\IdrisHlightStylePostulate}{\bfseries}
+\newcommand{\IdrisHlightStyleModule}   {\itshape}
 
 \newcommand{\IdrisHlightColourData}    {IndianRed1}
 \newcommand{\IdrisHlightColourType}    {DeepSkyBlue3}
@@ -36,13 +45,16 @@
 \newcommand{\IdrisHlightColourImplicit}{DarkOrchid3}
 \newcommand{\IdrisHlightColourComment} {grey}
 \newcommand{\IdrisHlightColourHole}    {yellow}
+\newcommand{\IdrisHlightColourNamespace}{black}
+\newcommand{\IdrisHlightColourPostulate}{DarkOrchid3}
+\newcommand{\IdrisHlightColourModule}   {black}
 
 \newcommand{\IdrisHole}[1]{{%
     \colorbox{\IdrisHlightColourHole}{%
       \IdrisHlightStyleHole\IdrisHlightFont%
       #1}}}
 
-\newcommand{\RawIdrisHighlight}[3]{{\textcolor{#1}{#2\IdrisHlightFont#3}}}
+\newcommand{\RawIdrisHighlight}[3]{{\textcolor{#1}{\IdrisHlightFont#2{#3}}}}
 
 \newcommand{\IdrisData}[1]{\RawIdrisHighlight{\IdrisHlightColourData}{\IdrisHlightStyleData}{#1}}
 \newcommand{\IdrisType}[1]{\RawIdrisHighlight{\IdrisHlightColourType}{\IdrisHlightStyleType}{#1}}
@@ -51,6 +63,9 @@
 \newcommand{\IdrisKeyword}[1]{\RawIdrisHighlight{\IdrisHlightColourKeyword}{\IdrisHlightStyleKeyword}{#1}}
 \newcommand{\IdrisImplicit}[1]{\RawIdrisHighlight{\IdrisHlightColourImplicit}{\IdrisHlightStyleImplicit}{#1}}
 \newcommand{\IdrisComment}[1]{\RawIdrisHighlight{\IdrisHlightColourComment}{\IdrisHlightStyleComment}{#1}}
+\newcommand{\IdrisNamespace}[1]{\RawIdrisHighlight{\IdrisHlightColourNamespace}{\IdrisHlightStyleNamespace}{#1}}
+\newcommand{\IdrisPostulate}[1]{\RawIdrisHighlight{\IdrisHlightColourPostulate}{\IdrisHlightStylePostulate}{#1}}
+\newcommand{\IdrisModule}[1]{\RawIdrisHighlight{\IdrisHlightColourModule}{\IdrisHlightStyleModule}{#1}}
 
 % Bugfix in fancyvrb to allow inline saved listings
 \makeatletter

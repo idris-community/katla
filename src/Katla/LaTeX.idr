@@ -20,11 +20,14 @@ annotate Nothing    s = s
 annotate (Just dec) s = apply (convert dec) s
   where
     convert : Decoration -> String
-    convert (Typ     ) = "IdrisType"
-    convert (Function) = "IdrisFunction"
-    convert (Data    ) = "IdrisData"
-    convert (Keyword ) = "IdrisKeyword"
-    convert (Bound   ) = "IdrisBound"
+    convert (Typ      ) = "IdrisType"
+    convert (Function ) = "IdrisFunction"
+    convert (Data     ) = "IdrisData"
+    convert (Keyword  ) = "IdrisKeyword"
+    convert (Bound    ) = "IdrisBound"
+    convert (Namespace) = "IdrisNamespace"
+    convert (Postulate) = "IdrisPostulate"
+    convert (Module   ) = "IdrisModule"
 
     apply : String -> String -> String
     apply f a = "\\\{f}{\{a}}"
@@ -41,30 +44,36 @@ laTeXHeader cfg =  """
 
 \\newcommand{\\Katla}                [2][]{\\VerbatimInput[commandchars=\\\\\\{\\}#1]{#2}}
 \\newcommand{\\IdrisHlightFont}         {\{cfg.font}}
-\\newcommand{\\IdrisHlightStyleData}    {\{cfg.datacons.style}}
-\\newcommand{\\IdrisHlightStyleType}    {\{cfg.typecons.style}}
-\\newcommand{\\IdrisHlightStyleBound}   {\{cfg.bound   .style}}
-\\newcommand{\\IdrisHlightStyleFunction}{\{cfg.function.style}}
-\\newcommand{\\IdrisHlightStyleKeyword} {\{cfg.keyword .style}}
-\\newcommand{\\IdrisHlightStyleImplicit}{\{cfg.bound   .style}}
-\\newcommand{\\IdrisHlightStyleComment} {\{cfg.comment .style}}
-\\newcommand{\\IdrisHlightStyleHole}    {\{cfg.hole    .style}}
+\\newcommand{\\IdrisHlightStyleData}    {\{cfg.datacons .style}}
+\\newcommand{\\IdrisHlightStyleType}    {\{cfg.typecons .style}}
+\\newcommand{\\IdrisHlightStyleBound}   {\{cfg.bound    .style}}
+\\newcommand{\\IdrisHlightStyleFunction}{\{cfg.function .style}}
+\\newcommand{\\IdrisHlightStyleKeyword} {\{cfg.keyword  .style}}
+\\newcommand{\\IdrisHlightStyleImplicit}{\{cfg.bound    .style}}
+\\newcommand{\\IdrisHlightStyleComment} {\{cfg.comment  .style}}
+\\newcommand{\\IdrisHlightStyleHole}    {\{cfg.hole     .style}}
+\\newcommand{\\IdrisHlightStyleNamespace}{\{cfg.namespce.style}}
+\\newcommand{\\IdrisHlightStylePostulate}{\{cfg.postulte.style}}
+\\newcommand{\\IdrisHlightStyleModule}   {\{cfg.aModule .style}}
 
-\\newcommand{\\IdrisHlightColourData}    {\{cfg.datacons.colour}}
-\\newcommand{\\IdrisHlightColourType}    {\{cfg.typecons.colour}}
-\\newcommand{\\IdrisHlightColourBound}   {\{cfg.bound   .colour}}
-\\newcommand{\\IdrisHlightColourFunction}{\{cfg.function.colour}}
-\\newcommand{\\IdrisHlightColourKeyword} {\{cfg.keyword .colour}}
-\\newcommand{\\IdrisHlightColourImplicit}{\{cfg.bound   .colour}}
-\\newcommand{\\IdrisHlightColourComment} {\{cfg.comment .colour}}
-\\newcommand{\\IdrisHlightColourHole}    {\{cfg.hole    .colour}}
+\\newcommand{\\IdrisHlightColourData}    {\{cfg.datacons .colour}}
+\\newcommand{\\IdrisHlightColourType}    {\{cfg.typecons .colour}}
+\\newcommand{\\IdrisHlightColourBound}   {\{cfg.bound    .colour}}
+\\newcommand{\\IdrisHlightColourFunction}{\{cfg.function .colour}}
+\\newcommand{\\IdrisHlightColourKeyword} {\{cfg.keyword  .colour}}
+\\newcommand{\\IdrisHlightColourImplicit}{\{cfg.bound    .colour}}
+\\newcommand{\\IdrisHlightColourComment} {\{cfg.comment  .colour}}
+\\newcommand{\\IdrisHlightColourHole}    {\{cfg.hole     .colour}}
+\\newcommand{\\IdrisHlightColourNamespace}{\{cfg.namespce.colour}}
+\\newcommand{\\IdrisHlightColourPostulate}{\{cfg.postulte.colour}}
+\\newcommand{\\IdrisHlightColourModule}   {\{cfg.aModule .colour}}
 
 \\newcommand{\\IdrisHole}[1]{{%
     \\colorbox{\\IdrisHlightColourHole}{%
       \\IdrisHlightStyleHole\\IdrisHlightFont%
       #1}}}
 
-\\newcommand{\\RawIdrisHighlight}[3]{{\\textcolor{#1}{#2\\IdrisHlightFont#3}}}
+\\newcommand{\\RawIdrisHighlight}[3]{{\\textcolor{#1}{\\IdrisHlightFont#2{#3}}}}
 
 \\newcommand{\\IdrisData}[1]{\\RawIdrisHighlight{\\IdrisHlightColourData}{\\IdrisHlightStyleData}{#1}}
 \\newcommand{\\IdrisType}[1]{\\RawIdrisHighlight{\\IdrisHlightColourType}{\\IdrisHlightStyleType}{#1}}
@@ -73,6 +82,9 @@ laTeXHeader cfg =  """
 \\newcommand{\\IdrisKeyword}[1]{\\RawIdrisHighlight{\\IdrisHlightColourKeyword}{\\IdrisHlightStyleKeyword}{#1}}
 \\newcommand{\\IdrisImplicit}[1]{\\RawIdrisHighlight{\\IdrisHlightColourImplicit}{\\IdrisHlightStyleImplicit}{#1}}
 \\newcommand{\\IdrisComment}[1]{\\RawIdrisHighlight{\\IdrisHlightColourComment}{\\IdrisHlightStyleComment}{#1}}
+\\newcommand{\\IdrisNamespace}[1]{\\RawIdrisHighlight{\\IdrisHlightColourNamespace}{\\IdrisHlightStyleNamespace}{#1}}
+\\newcommand{\\IdrisPostulate}[1]{\\RawIdrisHighlight{\\IdrisHlightColourPostulate}{\\IdrisHlightStylePostulate}{#1}}
+\\newcommand{\\IdrisModule}[1]{\\RawIdrisHighlight{\\IdrisHlightColourModule}{\\IdrisHlightStyleModule}{#1}}
 
 % Bugfix in fancyvrb to allow inline saved listings
 \\makeatletter
@@ -86,6 +98,8 @@ export
 standalonePre : Config -> String
 standalonePre config = """
   \\documentclass{article}
+
+  \\usepackage{inconsolata}
 
   \{laTeXHeader config}
 
