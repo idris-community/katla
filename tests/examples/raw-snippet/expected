@@ -25,7 +25,7 @@ namespace \IdrisNamespace{L0}
     \IdrisData{(::)} \IdrisKeyword{:} \IdrisType{Nat} \IdrisKeyword{->}\IdrisType{Type} \IdrisKeyword{->} \IdrisType{List0}
 
 \IdrisFunction{m} \IdrisKeyword{:} \IdrisType{Nat}
-\IdrisFunction{m} \IdrisKeyword{=} \IdrisFunction{believe_me} \IdrisData{%MkWorld}
+\IdrisFunction{m} \IdrisKeyword{=} \IdrisPostulate{believe_me} \IdrisData{%MkWorld}
 
 \IdrisFunction{Rainbow} \IdrisKeyword{:} \IdrisType{Nat} \IdrisKeyword{->} \IdrisType{Type}
 \IdrisFunction{Rainbow} \IdrisBound{n} \IdrisKeyword{=}  \IdrisType{[} \IdrisBound{n} \IdrisData{,} \IdrisFunction{m} \IdrisType{,} \IdrisBound{n} \IdrisData{]}
