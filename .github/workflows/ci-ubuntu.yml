@@ -47,19 +47,20 @@ jobs:
           echo "$HOME/.idris2/bin" >> $GITHUB_PATH
 
       # This caching step allows us to save a lot of building time by only
-      # rebuilding Idris2 from boostrap if absolutely necessary
+      # self-hosting Idris2 from boostrap if absolutely necessary
       - name: Cache Idris2
         uses: actions/cache@v2
         id: cache-idris2
         with:
           path: |
             ~/.idris2
-          key: ${{ runner.os }}-${{ env.IDRIS2_COMMIT }}
+          key: ${{ runner.os }}-${{ env.IDRIS2_COMMIT }}-${{ env.COLLIE_COMMIT }}-${{ env.IDRALL_COMMIT }}
 
-      - name: Install Chez
+      - name: Install dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y chezscheme
+          sudo apt-get install -y texlive
 
       - name: Install Idris2
         if: steps.cache-idris2.outputs.cache-hit != 'true'
