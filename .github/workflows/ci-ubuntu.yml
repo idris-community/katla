@@ -97,8 +97,8 @@ jobs:
       - name: Build package
         run: make
 
-      - name: Run tests
-        run: make test INTERACTIVE=''
+#      - name: Run tests
+#        run: make test INTERACTIVE=''
 
       - name: Build HTML doc
         run: make doc
