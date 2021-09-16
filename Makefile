@@ -8,5 +8,8 @@ build/exec/katla: .PHONY
 test: .PHONY
 	make -C tests
 
+doc:
+	idris2 --mkdoc katla.ipkg
+
 clean:
 	idris2 --clean katla.ipkg

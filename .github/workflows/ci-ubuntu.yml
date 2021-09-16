@@ -1,0 +1,108 @@
+name: Ubuntu
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+########################################################################
+## CONFIGURATION
+##
+## Key variables:
+##
+## IDRIS2_COMMIT picks the version of Idris2 to use to build the library.
+## It can either be:
+## - a branch,
+## - a hash of a specific commit (to target a bugfix for instance),
+## - or a tag e.g. tags/v0.4.0 (to target a released version).
+##
+## COLLIE_VERSION and IDRALL_COMMIT follow the same logic.
+##
+## SCHEME is the scheme executable used to bootstrap Idris2
+########################################################################
+
+env:
+  IDRIS2_COMMIT: c861845757ec05763d6b0aa3a72df9457c8532e6
+  COLLIE_COMMIT: main
+  IDRALL_COMMIT: main
+  SCHEME: scheme
+
+########################################################################
+## BUILD
+########################################################################
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Initialise variables
+        run: |
+          # Only deploy if the build follows from pushing to main
+          if [[ '${{ github.ref }}' == 'refs/heads/main' ]]; then
+             echo "KATLA_DEPLOY=true" >> $GITHUB_ENV
+          fi
+          echo "$HOME/.idris2/bin" >> $GITHUB_PATH
+
+      # This caching step allows us to save a lot of building time by only
+      # rebuilding Idris2 from boostrap if absolutely necessary
+      - name: Cache Idris2
+        uses: actions/cache@v2
+        id: cache-idris2
+        with:
+          path: |
+            ~/.idris2
+          key: ${{ runner.os }}-${{ env.IDRIS2_COMMIT }}
+
+      - name: Install Chez
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y chezscheme
+
+      - name: Install Idris2
+        if: steps.cache-idris2.outputs.cache-hit != 'true'
+        run: |
+          git clone https://github.com/idris-lang/idris2
+          cd idris2
+          git checkout ${{ env.IDRIS2_COMMIT }}
+          make bootstrap && make install
+
+      - name: Download and install Collie from github
+        if: steps.cache-idris2.outputs.cache-hit != 'true'
+        run: |
+          git clone https://github.com/ohad/collie
+          cd collie
+          git checkout ${{ env.COLLIE_COMMIT }}
+          make install
+          cd ..
+
+      - name: Download and install Idrall from github
+        if: steps.cache-idris2.outputs.cache-hit != 'true'
+        run: |
+          git clone https://github.com/alexhumphreys/idrall/
+          cd idrall
+          git checkout ${{ env.IDRALL_COMMIT }}
+          make install
+          cd ..
+
+      - name: Checkout Katla
+        uses: actions/checkout@v2
+
+      - name: Build package
+        run: make
+
+      - name: Run tests
+        run: make test INTERACTIVE=''
+
+      - name: Build HTML doc
+        run: make doc
+
+      - name: Deploy HTML
+        uses: JamesIves/github-pages-deploy-action@4.1.3
+        if: ${{ success() && env.KATLA_DEPLOY }}
+
+        with:
+          branch: gh-pages
+          folder: build/docs/
