@@ -1,5 +1,6 @@
 module Katla.Engine
 
+import System
 import System.File
 import Core.FC
 import Core.Name
@@ -12,7 +13,6 @@ import Data.String
 import Data.SnocList
 
 import Katla.Config
-import Katla.LaTeX
 
 
 {- Relies on the fact that PosMap is an efficient mapping from position:
@@ -30,31 +30,6 @@ pickSmallest (current ::: candidate :: ds) =
      then pickSmallest (candidate ::: ds)
      else pickSmallest (current   ::: ds)
 
-findDecoration : (Int, Int) -> PosMap ASemanticDecoration -> Maybe Decoration
-findDecoration pos@(row, col) posMap =
-  case dominators ((row, col), (row, col+1)) posMap of
-   []              => Nothing
-   (d :: ds)       => Just $ pickSmallest (d ::: ds)
-
-toString : SnocList Char -> String
-toString sx = (fastPack $ sx <>> [])
-
-snocEscape : (outputChars : SnocList Char) -> (new : Char) -> SnocList Char
-snocEscape sx c = sx <>< (escapeLatex c)
-
-
-||| True if input starts with EOL
-isNotEndOfLine : List Char -> Maybe (Char, List Char)
-isNotEndOfLine []           = Nothing
-isNotEndOfLine ('\r' :: _ ) = Nothing
-isNotEndOfLine ('\n' :: _ ) = Nothing
-isNotEndOfLine (x    :: xs) = Just (x, xs)
-
-ship : (output : File) -> Maybe Decoration -> (outputChars : SnocList Char) -> IO ()
-ship output decor outputChars = when (isSnoc outputChars) $ do
-   let decorated = annotate decor (toString outputChars)
-   ignore $ fPutStr output decorated
-
 public export
 Position : Type
 Position = (Int, Int)
@@ -67,25 +42,53 @@ export
 nextColumn : Position -> Position
 nextColumn (row, col) = (row, col + 1)
 
+findDecoration : Position -> PosMap ASemanticDecoration -> Maybe Decoration
+findDecoration pos@(row, col) posMap =
+  case dominators ((row, col), (row, col+1)) posMap of
+   []              => Nothing
+   (d :: ds)       => Just $ pickSmallest (d ::: ds)
+
+toString : SnocList Char -> String
+toString sx = (fastPack $ sx <>> [])
+
+snocEscape : (escape : Char -> List Char) ->
+             (outputChars : SnocList Char) -> (new : Char) -> SnocList Char
+snocEscape escape sx c = sx <>< escape c
+
+||| True if input starts with EOL
+isNotEndOfLine : List Char -> Maybe (Char, List Char)
+isNotEndOfLine []           = Nothing
+isNotEndOfLine ('\r' :: _ ) = Nothing
+isNotEndOfLine ('\n' :: _ ) = Nothing
+isNotEndOfLine (x    :: xs) = Just (x, xs)
+
+ship : (output : File) ->
+       Driver ->
+       Maybe Decoration -> (outputChars : SnocList Char) -> IO ()
+ship output driver decor outputChars = when (isSnoc outputChars) $ do
+   let decorated = driver.annotate decor (toString outputChars)
+   ignore $ fPutStr output decorated
+
 processLine : (output : File)
-           -> PosMap ASemanticDecoration
+           -> (meta : PosMap ASemanticDecoration)
+           -> Driver
            -> (currentDecor  : Maybe Decoration)
            -> (currentPos    : Position)
            -> (endPos : Maybe Position)
            -> (remainingLine : List Char)
            -> (currentOutput : SnocList Char)
            -> IO (Maybe Decoration, Position)
-processLine output posMap currentDecor currentPos endPos cs currentOutput
+processLine output meta driver currentDecor currentPos endPos cs currentOutput
   = case (isNotEndOfLine cs, maybe True (currentPos <) endPos) of
       -- We've reached the end of the line: output and return
       (Nothing, _) => do
         let nextPos = nextRow currentPos
-        ship output currentDecor currentOutput
+        ship output driver currentDecor currentOutput
         ignore $ fPutStrLn output ""
         pure (currentDecor, nextPos)
       -- We're past the caller-provided end position: output and return
       (Just _         , False) => do
-        ship output currentDecor currentOutput
+        ship output driver currentDecor currentOutput
         ignore $ fPutStrLn output ""
         pure (currentDecor, currentPos)
       -- We're still in bounds and have found a new character
@@ -96,22 +99,25 @@ processLine output posMap currentDecor currentPos endPos cs currentOutput
       -- grab it whole here.
       (Just (c , rest), True) => do
         let nextPos = nextColumn currentPos
-            decor   = findDecoration currentPos posMap
+            decor   = findDecoration currentPos meta
         if decor == currentDecor
-         then processLine output posMap currentDecor nextPos endPos rest (snocEscape currentOutput c)
-         else do ship output currentDecor currentOutput
-                 processLine output posMap decor nextPos endPos rest (snocEscape [<] c)
+         then let c = snocEscape driver.escape currentOutput c in
+              processLine output meta driver currentDecor nextPos endPos rest c
+         else do ship output driver currentDecor currentOutput
+                 let c = snocEscape driver.escape [<] c
+                 processLine output meta driver decor nextPos endPos rest c
 
 engineWithDecor : (input, output : File)
-       -> PosMap ASemanticDecoration
+       -> (meta : PosMap ASemanticDecoration)
+       -> Driver
        -> Maybe Decoration -> Position -> IO ()
-engineWithDecor input output posMap currentDecor currentPos
+engineWithDecor input output meta driver currentDecor currentPos
   = when (not !(fEOF input)) $ do
       Right str <- fGetLine input
         | Left err => pure ()
-      (nextDecor, nextPos) <- processLine output posMap currentDecor currentPos Nothing
-                              (fastUnpack str) [<]
-      engineWithDecor input output posMap nextDecor nextPos
+      next <- processLine output meta driver currentDecor currentPos Nothing
+                (fastUnpack str) [<]
+      uncurry (engineWithDecor input output meta driver) next
 
 export
 record ListingRange where
@@ -142,10 +148,13 @@ RangeByOffsetAndCols offset after startCol endCol =
 range.start = (range.startRow, range.startCol)
 range.end   = (range.endRow, range.endCol)
 
+
 engineWithRange : (input, output : File)
-       -> PosMap ASemanticDecoration -> ListingRange
+       -> (meta : PosMap ASemanticDecoration)
+       -> Driver
+       -> ListingRange
        -> Maybe Decoration -> Position -> IO ()
-engineWithRange input output posMap rowRange currentDecor currentPos
+engineWithRange input output meta driver rowRange currentDecor currentPos
   = when (not !(fEOF input)) $ do
       Right str <- fGetLine input
         | Left err => pure ()
@@ -159,21 +168,22 @@ engineWithRange input output posMap rowRange currentDecor currentPos
                         , (fst currentPos, rowRange.startCol)
                         , drop (cast rowRange.startCol) (fastUnpack str))
                    else (currentDecor, currentPos, fastUnpack str)
-              in processLine output posMap decor startPos (Just rowRange.end)
-                                    relevantLine [<]
+                  endPos = Just rowRange.end
+              in processLine output meta driver decor startPos endPos relevantLine [<]
          else pure (Nothing, nextRow currentPos))
       -- stop processing the file as soon as we're beyond the range
       unless (rowRange.end < nextPos) $
-        engineWithRange input output posMap rowRange nextDecor nextPos
+        engineWithRange input output meta driver rowRange nextDecor nextPos
 
 
 export
 engine : (input, output : File)
-       -> PosMap ASemanticDecoration
+       -> (meta : PosMap ASemanticDecoration)
+       -> Driver
        -> Position
        -> IO ()
-engine input output posMap = engineWithDecor input output posMap Nothing
-
+engine input output meta driver
+  = engineWithDecor input output meta driver Nothing
 
 record FileHandles where
   constructor MkHandles
@@ -222,45 +232,62 @@ data Snippet
 (Macro (_, _, mrange)).listing = mrange
 
 export
-katla : (snippet : Maybe Snippet) -> (mconfig : Maybe String) ->
-  (msourcefile, mmetadata, moutput : Maybe String) ->
-  -- TODO: would be nice to only specify one of source/metadata
-  IO ()
-katla _       _       Nothing _       _ = putStrLn "Expecting source file to print."
-katla _       _       _       Nothing _ = putStrLn "Expecting metadata file to output."
--- Generate a fully formed LaTeX file
-katla Nothing mconfig (Just filename) (Just metadata) moutput = do
+katla : (mkDriver : Config -> Driver) ->
+        (snippet : Maybe Snippet) ->
+        (mconfig : Maybe String) ->
+        (msourcefile, mmetadata, moutput : Maybe String) ->
+        -- TODO: would be nice to only specify one of source/metadata
+        IO ()
+katla _ _       _       Nothing _       _
+  = putStrLn "Expecting source file to print."
+katla _ _       _       _       Nothing _
+  = putStrLn "Expecting metadata file to output."
+-- Generate a fully formed file
+katla mkDriver Nothing mconfig (Just filename) (Just metadata) moutput = do
   Right files <- setupFiles mconfig filename metadata moutput
-  | Left ReportedError => pure ()
-  Right _ <- fPutStrLn files.output (standalonePre files.config)
-  | Left err => putStrLn "Error while generating preamble: \{show err}"
-  engine files.source files.output files.metadata (0,0)
+    | Left ReportedError => pure ()
+
+  let error : String -> IO ()
+      error str = do putStrLn "Error while \{str}"
+                     closeFile files.output
+                     exitFailure
+
+  let driver = mkDriver files.config
+  let (standalonePre, standalonePost) = driver.standalone
+
+  Right _ <- fPutStrLn files.output standalonePre
+    | Left err => error "generating preamble: \{show err}"
+  engine files.source files.output files.metadata driver (0,0)
   Right _ <- fPutStrLn files.output standalonePost
-  | Left err => putStrLn "Error while generating preamble: \{show err}"
+    | Left err => error "generating preamble: \{show err}"
   closeFile files.output
 -- Generate only the listing code
-katla (Just snippet) mconfig (Just filename) (Just metadata) moutput = do
+katla mkDriver (Just snippet) mconfig (Just filename) (Just metadata) moutput = do
   Right files <- setupFiles mconfig filename metadata moutput
-  | Left ReportedError => pure ()
+    | Left ReportedError => exitFailure
+
+  let error : String -> IO ()
+      error str = do putStrLn "Error while \{str}"
+                     closeFile files.output
+                     exitFailure
+
+  let driver = mkDriver files.config
   case snippet of
     Raw _ => pure ()
     Macro (name, inline, mrange) => do -- TODO: validate macro name, perhaps when parsing
-      Right _ <- fPutStrLn files.output
-        ((ifThenElse inline makeInlineMacroPre makeMacroPre) name)
-      | Left err => putStrLn
-        "Error while generating macro name \{name}: \{show err}"
+      let (pre, _) = ifThenElse inline driver.inlineMacro driver.blockMacro
+      Right _ <- fPutStrLn files.output (pre name)
+        | Left err => error "generating macro name \{name}: \{show err}"
       pure ()
   case snippet.listing of
-    Nothing    => engine          files.source files.output files.metadata
-                                         (0,0)
-    Just range => engineWithRange files.source files.output files.metadata
-                                  range Nothing (0,0)
+    Nothing    => engine          files.source files.output files.metadata driver (0,0)
+    Just range => engineWithRange files.source files.output files.metadata driver range Nothing (0,0)
   case snippet of
     Raw _ => pure ()
     Macro (name, inline, mrange) => do
-      Right _ <- fPutStrLn files.output $ ifThenElse inline makeInlineMacroPost makeMacroPost
-      | Left err => putStrLn
-        "Error while generating macro name \{name}: \{show err}"
+      let (_, post) = ifThenElse inline driver.inlineMacro driver.blockMacro
+      Right _ <- fPutStrLn files.output post
+        | Left err => error "generating macro name \{name}: \{show err}"
       pure ()
 
   closeFile files.output

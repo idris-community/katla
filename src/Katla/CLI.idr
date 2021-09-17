@@ -65,29 +65,34 @@ katlaExec : CLI.katlaCmd ~~> IO ()
 katlaExec =
   [ \parsed => case parsed.arguments of
        Just [src, md, output] =>
-         katla (rawSnippet $ parsed.modifiers.project "--snippet")
+         katla mkDriver
+               (rawSnippet $ parsed.modifiers.project "--snippet")
                (parsed.modifiers.project "--config")
                (Just src) (Just md) (Just output)
        Just [src, md]         =>
-         katla (rawSnippet $ parsed.modifiers.project "--snippet")
+         katla mkDriver
+               (rawSnippet $ parsed.modifiers.project "--snippet")
                (parsed.modifiers.project "--config")
                (Just src) (Just md) Nothing
        _ => putStrLn katlaCmd.usage
   , "macro"   ::=
     [\parsed => case parsed.arguments of
       Just [name, src, md, output] =>
-        katla (Just $ Macro (name, False, Nothing))
+        katla mkDriver
+              (Just $ Macro (name, False, Nothing))
               Nothing
               (Just src) (Just md) (Just output)
       Just [name, src, md, output, offset, before, after] =>
-        katla (Just $ Macro (name, False, Just $ RowRangeByOffset
+        katla mkDriver
+              (Just $ Macro (name, False, Just $ RowRangeByOffset
                                     { offset = cast offset - 1
                                     , before = cast before
                                     , after  = cast after}))
               Nothing
               (Just src) (Just md) (Just output)
       Just [name, src, md, offset, before, after] =>
-        katla (Just $ Macro (name, False, Just $ RowRangeByOffset
+        katla mkDriver
+              (Just $ Macro (name, False, Just $ RowRangeByOffset
                                     { offset = cast offset - 1
                                     , before = cast before
                                     , after  = cast after}))
@@ -95,13 +100,15 @@ katlaExec =
               (Just src) (Just md) Nothing
 
       Just [name, src, md] =>
-        katla (Just $ Macro (name, False, Nothing))
+        katla mkDriver
+              (Just $ Macro (name, False, Nothing))
               Nothing
               (Just src) (Just md) Nothing
       _ => putStrLn katlaCmd.usage
     , "inline" ::= [\parsed => case parsed.arguments of
       Just [name, src, md, output, offset, line, startCol, endCol] =>
-        katla (Just $ Macro (name, True, Just (RangeByOffsetAndCols
+        katla mkDriver
+              (Just $ Macro (name, True, Just (RangeByOffsetAndCols
                                     { offset = cast offset - 1
                                     , after  = cast line
                                     , startCol  = cast startCol - 1
@@ -110,7 +117,8 @@ katlaExec =
               Nothing
               (Just src) (Just md) (Just output)
       Just [name, src, md,         offset, line, startCol, endCol] => do
-        katla (Just $ Macro (name, True, Just (RangeByOffsetAndCols
+        katla mkDriver
+              (Just $ Macro (name, True, Just (RangeByOffsetAndCols
                                     { offset = cast offset - 1
                                     , after  = cast line
                                     , startCol  = cast startCol - 1

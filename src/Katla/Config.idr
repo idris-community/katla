@@ -6,6 +6,7 @@ import Collie
 import System.File
 import System.Path
 import Data.Maybe
+import Core.Metadata
 
 %language ElabReflection
 
@@ -121,3 +122,13 @@ getConfiguration (Just filename) = do
                    pure defaultConfig
 
   pure config
+
+
+public export
+record Driver where
+  constructor MkDriver
+  escape      : Char -> List Char
+  annotate    : Maybe Decoration -> String -> String
+  standalone  : (String, String)
+  inlineMacro : (String -> String, String)
+  blockMacro  : (String -> String, String)

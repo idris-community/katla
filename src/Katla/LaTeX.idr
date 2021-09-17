@@ -140,8 +140,14 @@ makeInlineMacroPost = """
   \\end{SaveVerbatim}
   """
 
-
-
+export
+mkDriver : Config -> Driver
+mkDriver config = MkDriver
+  escapeLatex
+  annotate
+  (standalonePre config, standalonePost)
+  (makeInlineMacroPre, makeInlineMacroPost)
+  (makeMacroPre, makeMacroPost)
 
 public export
 preambleCmd : Command "preamble"
