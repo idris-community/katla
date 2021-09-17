@@ -33,10 +33,6 @@ annotate (Just dec) s = apply (convert dec) s
     apply f a = "\\\{f}{\{a}}"
 
 export
-color : String -> String
-color x = "\\color{\{x}}"
-
-export
 laTeXHeader : Config -> String
 laTeXHeader cfg =  """
 \\usepackage{fancyvrb}
