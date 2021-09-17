@@ -1,0 +1,58 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Katla.LaTeX</title>
+  <link rel="stylesheet" type="text/css" id="preferredStyle" href="../default.css">
+  <script>
+    /* Updates the stylesheet to use the preferred one.
+       Note that we set the link to root ++ sourceLoc because the config
+       is shared across the whole website, so the root may differ from
+       page to page.
+    */
+    function setStyleSource (sourceLoc) {
+      document.getElementById("preferredStyle").href = "../" + sourceLoc + ".css";
+      document.getElementById("selectPreferredStyle").value = sourceLoc;
+    }
+    /* Initialises the preferred style sheet:
+       1. if there is a stored value then use that
+          otherwise select the default
+       2. set both the css link href & the drop down menu selected option
+    */
+    function initStyleSource () {
+      var preferredStyle = localStorage.getItem("stylefile");
+      if (preferredStyle !== null) {
+        setStyleSource(preferredStyle);
+      } else {
+        setStyleSource("default");
+      };
+    }
+    function saveStyleSource (preferredStyle) {
+      localStorage.stylefile = preferredStyle;
+    }
+    </script>
+</head>
+<body class="namespace">
+<header>
+  <strong>Idris2Doc</strong> : Katla.LaTeX
+  <nav><a href="../index.html">Index</a>
+  <select id="selectPreferredStyle">
+    <option value="default">Default</option>
+<option value="alternative">Alternative</option>
+<option value="blackandwhite">Black & White</option>
+
+  </select>
+  </nav>
+  <script>
+  /* We start by initialising the style source */
+  initStyleSource();
+  /* This listens for changes on the drop down menu and updates the
+     css used for the current page when a selection is made.
+  */
+  document.getElementById("selectPreferredStyle").addEventListener("change", function(){
+    var selected = this.options[this.selectedIndex].value; /* the option chosen */
+    setStyleSource (selected);
+    saveStyleSource (selected);
+  });
+</script>
+</header>
+<div class="container"><div id="moduleHeader"><h1>Katla.LaTeX</h1><pre>Functions for generating</pre></div><dl class="decls"><dt id="Katla.LaTeX.annotate"><a class="type" href="Katla.LaTeX.html#Katla.LaTeX.annotate"><span class="name function">annotate</span></a>&ensp;:&ensp;<span class="type resolved" title="Prelude.Types.Maybe"><span class="name type">Maybe</span></span>&ensp;<span class="type resolved" title="Core.Metadata.Decoration"><span class="name type">Decoration</span></span>&ensp;-&gt;&ensp;<span class="name type">String</span>&ensp;-&gt;&ensp;<span class="name type">String</span></dt><dd>  </dd><dt id="Katla.LaTeX.color"><a class="type" href="Katla.LaTeX.html#Katla.LaTeX.color"><span class="name function">color</span></a>&ensp;:&ensp;<span class="name type">String</span>&ensp;-&gt;&ensp;<span class="name type">String</span></dt><dd>  </dd><dt id="Katla.LaTeX.escapeLatex"><a class="type" href="Katla.LaTeX.html#Katla.LaTeX.escapeLatex"><span class="name function">escapeLatex</span></a>&ensp;:&ensp;<span class="name type">Char</span>&ensp;-&gt;&ensp;<span class="type resolved" title="Prelude.Basics.List"><span class="name type">List</span></span>&ensp;<span class="name type">Char</span></dt><dd>  </dd><dt id="Katla.LaTeX.init"><a class="type" href="Katla.LaTeX.html#Katla.LaTeX.init"><span class="name function">init</span></a>&ensp;:&ensp;<span class="type resolved" title="Collie.Core.ParsedCommand"><span class="name type">ParsedCommand</span></span>&ensp;<span class="name constructor">"init"</span>&ensp;<a class="type" href="Katla.LaTeX.html#Katla.LaTeX.initCmd"><span class="name function">initCmd</span></a>&ensp;-&gt;&ensp;<span class="type resolved" title="PrimIO.IO"><span class="name type">IO</span></span>&ensp;()</dt><dd>  </dd><dt id="Katla.LaTeX.initCmd"><a class="type" href="Katla.LaTeX.html#Katla.LaTeX.initCmd"><span class="name function">initCmd</span></a>&ensp;:&ensp;<span class="type resolved" title="Collie.Core.Command"><span class="name type">Command</span></span>&ensp;<span class="name constructor">"init"</span></dt><dd>  </dd><dt id="Katla.LaTeX.initExec"><a class="type" href="Katla.LaTeX.html#Katla.LaTeX.initExec"><span class="name function">initExec</span></a>&ensp;:&ensp;<span class="type resolved" title="Prelude.Types.Maybe"><span class="name type">Maybe</span></span>&ensp;<span class="name type">String</span>&ensp;-&gt;&ensp;<span class="type resolved" title="PrimIO.IO"><span class="name type">IO</span></span>&ensp;()</dt><dd>  </dd><dt id="Katla.LaTeX.laTeXHeader"><a class="type" href="Katla.LaTeX.html#Katla.LaTeX.laTeXHeader"><span class="name function">laTeXHeader</span></a>&ensp;:&ensp;<a class="type" href="Katla.Config.html#Katla.Config.Config"><span class="name type">Config</span></a>&ensp;-&gt;&ensp;<span class="name type">String</span></dt><dd>  </dd><dt id="Katla.LaTeX.makeInlineMacroPost"><a class="type" href="Katla.LaTeX.html#Katla.LaTeX.makeInlineMacroPost"><span class="name function">makeInlineMacroPost</span></a>&ensp;:&ensp;<span class="name type">String</span></dt><dd>  </dd><dt id="Katla.LaTeX.makeInlineMacroPre"><a class="type" href="Katla.LaTeX.html#Katla.LaTeX.makeInlineMacroPre"><span class="name function">makeInlineMacroPre</span></a>&ensp;:&ensp;<span class="name type">String</span>&ensp;-&gt;&ensp;<span class="name type">String</span></dt><dd>  </dd><dt id="Katla.LaTeX.makeMacroPost"><a class="type" href="Katla.LaTeX.html#Katla.LaTeX.makeMacroPost"><span class="name function">makeMacroPost</span></a>&ensp;:&ensp;<span class="name type">String</span></dt><dd>  </dd><dt id="Katla.LaTeX.makeMacroPre"><a class="type" href="Katla.LaTeX.html#Katla.LaTeX.makeMacroPre"><span class="name function">makeMacroPre</span></a>&ensp;:&ensp;<span class="name type">String</span>&ensp;-&gt;&ensp;<span class="name type">String</span></dt><dd>  </dd><dt id="Katla.LaTeX.preamble"><a class="type" href="Katla.LaTeX.html#Katla.LaTeX.preamble"><span class="name function">preamble</span></a>&ensp;:&ensp;<span class="type resolved" title="Collie.Core.ParsedCommand"><span class="name type">ParsedCommand</span></span>&ensp;<span class="name constructor">"preamble"</span>&ensp;<a class="type" href="Katla.LaTeX.html#Katla.LaTeX.preambleCmd"><span class="name function">preambleCmd</span></a>&ensp;-&gt;&ensp;<span class="type resolved" title="PrimIO.IO"><span class="name type">IO</span></span>&ensp;()</dt><dd>  </dd><dt id="Katla.LaTeX.preambleCmd"><a class="type" href="Katla.LaTeX.html#Katla.LaTeX.preambleCmd"><span class="name function">preambleCmd</span></a>&ensp;:&ensp;<span class="type resolved" title="Collie.Core.Command"><span class="name type">Command</span></span>&ensp;<span class="name constructor">"preamble"</span></dt><dd>  </dd><dt id="Katla.LaTeX.standalonePost"><a class="type" href="Katla.LaTeX.html#Katla.LaTeX.standalonePost"><span class="name function">standalonePost</span></a>&ensp;:&ensp;<span class="name type">String</span></dt><dd>  </dd><dt id="Katla.LaTeX.standalonePre"><a class="type" href="Katla.LaTeX.html#Katla.LaTeX.standalonePre"><span class="name function">standalonePre</span></a>&ensp;:&ensp;<a class="type" href="Katla.Config.html#Katla.Config.Config"><span class="name type">Config</span></a>&ensp;-&gt;&ensp;<span class="name type">String</span></dt><dd>  </dd></dl></div><footer>Produced by Idris 2 version 0.4.0-971afa9f5</footer></body></html>
