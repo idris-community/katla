@@ -60,9 +60,9 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y chezscheme
-          sudo apt-get install -y texlive texlive-latex-extra
+          sudo apt-get install -y texlive texlive-latex-extra texlive-fonts-extra
 
-      - name: Install Idris2
+      - name: Install Idris2 & its API
         if: steps.cache-idris2.outputs.cache-hit != 'true'
         run: |
           git clone https://github.com/idris-lang/idris2
