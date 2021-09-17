@@ -84,7 +84,7 @@ processLine output meta driver currentDecor currentPos endPos cs currentOutput
       (Nothing, _) => do
         let nextPos = nextRow currentPos
         ship output driver currentDecor currentOutput
-        ignore $ fPutStrLn output ""
+        ignore $ fPutStrLn output (snd driver.line)
         pure (currentDecor, nextPos)
       -- We're past the caller-provided end position: output and return
       (Just _         , False) => do
@@ -117,7 +117,10 @@ engineWithDecor input output meta driver currentDecor currentPos
         | Left err => pure ()
       next <- processLine output meta driver currentDecor currentPos Nothing
                 (fastUnpack str) [<]
-      uncurry (engineWithDecor input output meta driver) next
+      let (nextDecor, nextPos) = next
+      when (snd nextPos == 0) $
+        ignore $ fPutStr output (fst driver.line (cast $ fst nextPos))
+      engineWithDecor input output meta driver nextDecor nextPos
 
 export
 record ListingRange where

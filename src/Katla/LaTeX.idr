@@ -139,6 +139,7 @@ makeInlineMacroPost = """
 export
 mkDriver : Config -> Driver
 mkDriver config = MkDriver
+  (const "", "")
   escapeLatex
   annotate
   (standalonePre config, standalonePost)
@@ -198,7 +199,7 @@ initExec moutput = do
               Error while opening configuration file \{maybe "stdout" id moutput}:
               \{show err}
               """
-  Right () <- fPutStrLn file $ defaultConfig.toString
+  Right () <- fPutStrLn file $ defaultLatexConfig.toString
   | Left err => putStrLn """
       Error while writing preamble file \{maybe "stdout" id moutput}:
       \{show err}

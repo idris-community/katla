@@ -62,8 +62,54 @@ conf.toString = """
 
 
 export
-defaultConfig : Config
-defaultConfig = MkConfig
+defaultHTMLConfig : Config
+defaultHTMLConfig = MkConfig
+  { font = #"\ttfamily"#
+  , datacons = MkCategory
+    { style  = ""
+    , colour = "darkred"
+    }
+  , typecons = MkCategory
+    { style  = ""
+    , colour = "blue"
+    }
+  , bound = MkCategory
+    { style  = ""
+    , colour = "black"
+    }
+  , function = MkCategory
+    { style  = ""
+    , colour = "darkgreen"
+    }
+  , keyword = MkCategory
+    { style  = "text-decoration: underline;"
+    , colour = ""
+    }
+  , comment = MkCategory
+    { style  = ""
+    , colour = "darkorange"
+    }
+  , hole = MkCategory
+    { style  = "font-weight: bold;"
+    , colour = "yellow"
+    }
+  , namespce = MkCategory
+    { style = "font-style: italic;"
+    , colour = "black"
+    }
+  , postulte = MkCategory
+    { style = "font-weight: bold;"
+    , colour = "red"
+    }
+  , aModule  = MkCategory
+    { style = "font-style: italic;"
+    , colour = "black"
+    }
+  }
+
+export
+defaultLatexConfig : Config
+defaultLatexConfig = MkConfig
   { font = #"\ttfamily"#
   , datacons = MkCategory
     { style  = ""
@@ -111,7 +157,7 @@ defaultConfig = MkConfig
 
 export
 getConfiguration : (configFile : Maybe String) -> IO Config
-getConfiguration Nothing = pure defaultConfig
+getConfiguration Nothing = pure defaultHTMLConfig
 getConfiguration (Just filename) = do
   Right config <- liftIOEither (deriveFromDhallString {ty = Config} filename)
   | Left err => do putStrLn  """
@@ -119,7 +165,7 @@ getConfiguration (Just filename) = do
                      \{show err}
                      Using default configuration instead.
                      """
-                   pure defaultConfig
+                   pure defaultHTMLConfig
 
   pure config
 
@@ -127,6 +173,7 @@ getConfiguration (Just filename) = do
 public export
 record Driver where
   constructor MkDriver
+  line        : (Nat -> String, String)
   escape      : Char -> List Char
   annotate    : Maybe Decoration -> String -> String
   standalone  : (String, String)

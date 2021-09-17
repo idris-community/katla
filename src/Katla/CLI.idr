@@ -4,6 +4,7 @@ import public Collie
 
 import Katla.Config
 import Katla.LaTeX
+import Katla.HTML
 import Katla.Engine
 
 %default covering
@@ -65,12 +66,12 @@ katlaExec : CLI.katlaCmd ~~> IO ()
 katlaExec =
   [ \parsed => case parsed.arguments of
        Just [src, md, output] =>
-         katla mkDriver
+         katla HTML.mkDriver
                (rawSnippet $ parsed.modifiers.project "--snippet")
                (parsed.modifiers.project "--config")
                (Just src) (Just md) (Just output)
        Just [src, md]         =>
-         katla mkDriver
+         katla HTML.mkDriver
                (rawSnippet $ parsed.modifiers.project "--snippet")
                (parsed.modifiers.project "--config")
                (Just src) (Just md) Nothing
@@ -78,12 +79,12 @@ katlaExec =
   , "macro"   ::=
     [\parsed => case parsed.arguments of
       Just [name, src, md, output] =>
-        katla mkDriver
+        katla HTML.mkDriver
               (Just $ Macro (name, False, Nothing))
               Nothing
               (Just src) (Just md) (Just output)
       Just [name, src, md, output, offset, before, after] =>
-        katla mkDriver
+        katla HTML.mkDriver
               (Just $ Macro (name, False, Just $ RowRangeByOffset
                                     { offset = cast offset - 1
                                     , before = cast before
@@ -91,7 +92,7 @@ katlaExec =
               Nothing
               (Just src) (Just md) (Just output)
       Just [name, src, md, offset, before, after] =>
-        katla mkDriver
+        katla HTML.mkDriver
               (Just $ Macro (name, False, Just $ RowRangeByOffset
                                     { offset = cast offset - 1
                                     , before = cast before
@@ -100,14 +101,14 @@ katlaExec =
               (Just src) (Just md) Nothing
 
       Just [name, src, md] =>
-        katla mkDriver
+        katla HTML.mkDriver
               (Just $ Macro (name, False, Nothing))
               Nothing
               (Just src) (Just md) Nothing
       _ => putStrLn katlaCmd.usage
     , "inline" ::= [\parsed => case parsed.arguments of
       Just [name, src, md, output, offset, line, startCol, endCol] =>
-        katla mkDriver
+        katla HTML.mkDriver
               (Just $ Macro (name, True, Just (RangeByOffsetAndCols
                                     { offset = cast offset - 1
                                     , after  = cast line
@@ -117,7 +118,7 @@ katlaExec =
               Nothing
               (Just src) (Just md) (Just output)
       Just [name, src, md,         offset, line, startCol, endCol] => do
-        katla mkDriver
+        katla HTML.mkDriver
               (Just $ Macro (name, True, Just (RangeByOffsetAndCols
                                     { offset = cast offset - 1
                                     , after  = cast line
