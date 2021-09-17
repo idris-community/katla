@@ -83,7 +83,7 @@ processLine output posMap currentDecor currentPos endPos cs currentOutput
         ship output currentDecor currentOutput
         ignore $ fPutStrLn output ""
         pure (currentDecor, nextPos)
-      -- We're passed the caller-provided end position: output and return
+      -- We're past the caller-provided end position: output and return
       (Just _         , False) => do
         ship output currentDecor currentOutput
         ignore $ fPutStrLn output ""
