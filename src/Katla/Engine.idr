@@ -53,31 +53,49 @@ isNotEndOfLine (x    :: xs) = Just (x, xs)
 ship : (output : File) -> Maybe Decoration -> (outputChars : SnocList Char) -> IO ()
 ship output decor outputChars = when (isSnoc outputChars) $ do
    let decorated = annotate decor (toString outputChars)
-   _ <- fPutStr output decorated
-   pure ()
+   ignore $ fPutStr output decorated
+
+public export
+Position : Type
+Position = (Int, Int)
+
+export
+nextRow : Position -> Position
+nextRow (row, _) = (row + 1, 0)
+
+export
+nextColumn : Position -> Position
+nextColumn (row, col) = (row, col + 1)
 
 processLine : (output : File)
            -> PosMap ASemanticDecoration
            -> (currentDecor  : Maybe Decoration)
-           -> (currentPos    : (Int, Int))
-           -> (endPos : Maybe (Int, Int))
+           -> (currentPos    : Position)
+           -> (endPos : Maybe Position)
            -> (remainingLine : List Char)
            -> (currentOutput : SnocList Char)
-           -> IO (Maybe Decoration, (Int, Int))
-processLine output posMap currentDecor currentPos@(currentRow, currentCol) endPos cs currentOutput
+           -> IO (Maybe Decoration, Position)
+processLine output posMap currentDecor currentPos endPos cs currentOutput
   = case (isNotEndOfLine cs, maybe True (currentPos <) endPos) of
+      -- We've reached the end of the line: output and return
       (Nothing, _) => do
-        let nextPos = (currentRow + 1, 0)
+        let nextPos = nextRow currentPos
         ship output currentDecor currentOutput
-        _ <- fPutStrLn output ""
+        ignore $ fPutStrLn output ""
         pure (currentDecor, nextPos)
+      -- We're past the caller-provided end position: output and return
       (Just _         , False) => do
         ship output currentDecor currentOutput
-        _ <- fPutStrLn output ""
+        ignore $ fPutStrLn output ""
         pure (currentDecor, currentPos)
+      -- We're still in bounds and have found a new character
+      -- Assuming decorations may overlap, we need to check whether there is a
+      -- new one or whether we can keep munching the line using the same decor.
+      -- If we were willing to assume decorations are non-overlapping we could
+      -- just return the size of the decorated chunk in `findDecoration` and
+      -- grab it whole here.
       (Just (c , rest), True) => do
-        let (currentRow, currentCol) = currentPos
-            nextPos = (currentRow, currentCol + 1)
+        let nextPos = nextColumn currentPos
             decor   = findDecoration currentPos posMap
         if decor == currentDecor
          then processLine output posMap currentDecor nextPos endPos rest (snocEscape currentOutput c)
@@ -86,7 +104,7 @@ processLine output posMap currentDecor currentPos@(currentRow, currentCol) endPo
 
 engineWithDecor : (input, output : File)
        -> PosMap ASemanticDecoration
-       -> Maybe Decoration -> (Int, Int) -> IO ()
+       -> Maybe Decoration -> Position -> IO ()
 engineWithDecor input output posMap currentDecor currentPos
   = when (not !(fEOF input)) $ do
       Right str <- fGetLine input
@@ -120,18 +138,20 @@ RangeByOffsetAndCols offset after startCol endCol =
   , endCol   = endCol
   }
 
-(.start),(.end) : ListingRange -> (Int, Int)
+(.start),(.end) : ListingRange -> Position
 range.start = (range.startRow, range.startCol)
 range.end   = (range.endRow, range.endCol)
 
 engineWithRange : (input, output : File)
        -> PosMap ASemanticDecoration -> ListingRange
-       -> Maybe Decoration -> (Int, Int) -> IO ()
+       -> Maybe Decoration -> Position -> IO ()
 engineWithRange input output posMap rowRange currentDecor currentPos
   = when (not !(fEOF input)) $ do
       Right str <- fGetLine input
         | Left err => pure ()
       (nextDecor, nextPos) <- (
+         -- If the current line in the file intersects with the range
+         -- then process the line and otherwise just go to the next one
          if rowRange.startRow <= fst currentPos && currentPos < rowRange.end
          then let (decor, startPos, relevantLine) =
                    if rowRange.startRow == fst currentPos
@@ -141,14 +161,16 @@ engineWithRange input output posMap rowRange currentDecor currentPos
                    else (currentDecor, currentPos, fastUnpack str)
               in processLine output posMap decor startPos (Just rowRange.end)
                                     relevantLine [<]
-         else pure (Nothing, (fst currentPos + 1, 0)))
-      engineWithRange input output posMap rowRange nextDecor nextPos
+         else pure (Nothing, nextRow currentPos))
+      -- stop processing the file as soon as we're beyond the range
+      unless (rowRange.end < nextPos) $
+        engineWithRange input output posMap rowRange nextDecor nextPos
 
 
 export
 engine : (input, output : File)
        -> PosMap ASemanticDecoration
-       -> (Int, Int)
+       -> Position
        -> IO ()
 engine input output posMap = engineWithDecor input output posMap Nothing
 
@@ -191,7 +213,9 @@ setupFiles mconfig filename metadata moutput = do
     }
 
 public export
-data Snippet = Raw (Maybe ListingRange) | Macro (String, Bool, Maybe ListingRange)
+data Snippet
+  = Raw (Maybe ListingRange)
+  | Macro (String, Bool, Maybe ListingRange)
 
 (.listing) : Snippet -> Maybe ListingRange
 (Raw mrange          ).listing = mrange
@@ -208,7 +232,6 @@ katla _       _       _       Nothing _ = putStrLn "Expecting metadata file to o
 katla Nothing mconfig (Just filename) (Just metadata) moutput = do
   Right files <- setupFiles mconfig filename metadata moutput
   | Left ReportedError => pure ()
-
   Right _ <- fPutStrLn files.output (standalonePre files.config)
   | Left err => putStrLn "Error while generating preamble: \{show err}"
   engine files.source files.output files.metadata (0,0)
