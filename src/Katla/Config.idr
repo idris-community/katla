@@ -181,7 +181,7 @@ getConfiguration backend (Just filename) = do
 public export
 record Driver where
   constructor MkDriver
-  line        : (Nat -> String, String)
+  line        : ((width, lineNumber : Nat) -> String, String)
   escape      : Char -> List Char
   annotate    : Maybe Decoration -> String -> String
   standalone  : (String, String)

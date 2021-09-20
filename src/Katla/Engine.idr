@@ -109,20 +109,26 @@ processLine output meta driver currentDecor currentPos endPos cs currentOutput
                  let c = snocEscape driver.escape [<] c
                  processLine output meta driver decor nextPos endPos rest c
 
-engineWithDecor : (input, output : File)
-       -> (meta : PosMap ASemanticDecoration)
-       -> Driver
-       -> Maybe Decoration -> Position -> IO ()
-engineWithDecor input output meta driver currentDecor currentPos
+engineWithDecor
+  : (input, output : File)
+  -> (lineNumberWidth : Nat) -- width of the largest line number e.g. 3 for 999
+  -> (meta : PosMap ASemanticDecoration)
+  -> Driver
+  -> Maybe Decoration -> Position -> IO ()
+engineWithDecor input output lineNumberWidth meta driver currentDecor currentPos
   = when (not !(fEOF input)) $ do
       Right str <- fGetLine input
         | Left err => pure ()
+      -- if we're starting a new line, output the corresponding marker
+      when (snd currentPos == 0) $
+        ignore $ fPutStr output
+               $ fst driver.line lineNumberWidth
+               $ cast $ fst currentPos
+      -- then process the line
       next <- processLine output meta driver currentDecor currentPos Nothing
                 (fastUnpack str) [<]
       let (nextDecor, nextPos) = next
-      when (snd nextPos == 0) $
-        ignore $ fPutStr output (fst driver.line (cast $ fst nextPos))
-      engineWithDecor input output meta driver nextDecor nextPos
+      engineWithDecor input output lineNumberWidth meta driver nextDecor nextPos
 
 export
 record ListingRange where
@@ -154,12 +160,14 @@ range.start = (range.startRow, range.startCol)
 range.end   = (range.endRow, range.endCol)
 
 
-engineWithRange : (input, output : File)
-       -> (meta : PosMap ASemanticDecoration)
-       -> Driver
-       -> ListingRange
-       -> Maybe Decoration -> Position -> IO ()
-engineWithRange input output meta driver rowRange currentDecor currentPos
+engineWithRange
+  : (input, output : File)
+  -> (lineNumberWidth : Nat) -- width of the largest line number e.g. 3 for 999
+  -> (meta : PosMap ASemanticDecoration)
+  -> Driver
+  -> ListingRange
+  -> Maybe Decoration -> Position -> IO ()
+engineWithRange input output lineNumberWidth meta driver rowRange currentDecor currentPos
   = when (not !(fEOF input)) $ do
       Right str <- fGetLine input
         | Left err => pure ()
@@ -167,28 +175,33 @@ engineWithRange input output meta driver rowRange currentDecor currentPos
          -- If the current line in the file intersects with the range
          -- then process the line and otherwise just go to the next one
          if rowRange.startRow <= fst currentPos && currentPos < rowRange.end
-         then let (decor, startPos, relevantLine) =
+         then do
+           let (decor, startPos, relevantLine) =
                    if rowRange.startRow == fst currentPos
-                   then ( Nothing
-                        , (fst currentPos, rowRange.startCol)
-                        , drop (cast rowRange.startCol) (fastUnpack str))
-                   else (currentDecor, currentPos, fastUnpack str)
-                  endPos = Just rowRange.end
-              in processLine output meta driver decor startPos endPos relevantLine [<]
+                     then ( Nothing
+                          , (fst currentPos, rowRange.startCol)
+                          , drop (cast rowRange.startCol) (fastUnpack str))
+                     else (currentDecor, currentPos, fastUnpack str)
+           let endPos = Just rowRange.end
+           ignore $ fPutStr output
+                  $ fst driver.line lineNumberWidth
+                  $ cast $ fst currentPos
+           processLine output meta driver decor startPos endPos relevantLine [<]
          else pure (Nothing, nextRow currentPos))
       -- stop processing the file as soon as we're beyond the range
       unless (rowRange.end < nextPos) $
-        engineWithRange input output meta driver rowRange nextDecor nextPos
+        engineWithRange input output lineNumberWidth meta driver rowRange nextDecor nextPos
 
 
 export
 engine : (input, output : File)
+       -> (lineNumberWidth : Nat)
        -> (meta : PosMap ASemanticDecoration)
        -> Driver
        -> Position
        -> IO ()
-engine input output meta driver
-  = engineWithDecor input output meta driver Nothing
+engine input output lnw meta driver
+  = engineWithDecor input output lnw meta driver Nothing
 
 record FileHandles where
   constructor MkHandles
@@ -222,7 +235,6 @@ setupFiles backend mconfig filename metadata moutput = do
   Right output <- maybe (pure $ Right stdout) (\output => openFile output WriteTruncate) moutput
   | Left err => do putStrLn "couldn't open output: "
                    exit
-
 
   pure $ Right $ MkHandles
     { config, source, output
@@ -268,7 +280,10 @@ katla backend Nothing mconfig (Just filename) (Just metadata) moutput = do
 
   Right _ <- fPutStrLn files.output standalonePre
     | Left err => error "generating preamble: \{show err}"
-  engine files.source files.output files.metadata driver (0,0)
+  Right content <- readFile filename
+     | Left _  => pure ()
+  let lnw = length $ show $ length $ lines content
+  engine files.source files.output lnw files.metadata driver (0,0)
   Right _ <- fPutStrLn files.output standalonePost
     | Left err => error "generating preamble: \{show err}"
   closeFile files.output
@@ -291,8 +306,14 @@ katla backend (Just snippet) mconfig (Just filename) (Just metadata) moutput = d
         | Left err => error "generating macro name \{name}: \{show err}"
       pure ()
   case snippet.listing of
-    Nothing    => engine          files.source files.output files.metadata driver (0,0)
-    Just range => engineWithRange files.source files.output files.metadata driver range Nothing (0,0)
+    Nothing    =>
+      do Right content <- readFile filename
+           | Left _  => pure ()
+         let lnw = length $ show $ length $ lines content
+         engine files.source files.output lnw files.metadata driver (0,0)
+    Just range =>
+      do let lnw = length $ show range.endRow
+         engineWithRange files.source files.output lnw files.metadata driver range Nothing (0,0)
   case snippet of
     Raw _ => pure ()
     Macro (name, inline, mrange) => do

@@ -140,7 +140,7 @@ makeInlineMacroPost = """
 export
 mkDriver : Config -> Driver
 mkDriver config = MkDriver
-  (const "", "")
+  (\_, _ => "", "")
   escapeLatex
   annotate
   (standalonePre config, standalonePost)

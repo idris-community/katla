@@ -87,6 +87,18 @@ standalonePre config = """
     <meta charset="utf-8">
     <style>
     \{styleHeader config}
+
+    .IdrisLineNumber {
+      text-decoration: none;
+      color: lightgrey;
+      user-select: none;
+    }
+    .IdrisLineNumber:hover {
+      color: darkgray;
+    }
+    .IdrisLineNumber:target {
+      color: gray;
+    }
     </style>
   </head>
   <body>
@@ -125,11 +137,15 @@ makeInlineMacroPost = """
   </code>
   """
 
-
 export
 mkDriver : Config -> Driver
 mkDriver config = MkDriver
-  (const "", "<br />")
+  (\ wdth, ln =>
+    let ln = show ln
+        lineID = "line\{ln}"
+        desc = concat (replicate (minus wdth (length ln)) "&nbsp;" ++ [ln]) in
+    ##"<a href="#\##{lineID}" id="\##{lineID}" class="IdrisLineNumber"> \##{desc} | </a>"##
+  , "<br />")
   escapeHTML
   annotate
   (standalonePre config, standalonePost)
