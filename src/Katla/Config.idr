@@ -6,6 +6,7 @@ import Collie
 import System.File
 import System.Path
 import Data.Maybe
+import Core.Metadata
 
 %language ElabReflection
 
@@ -61,8 +62,54 @@ conf.toString = """
 
 
 export
-defaultConfig : Config
-defaultConfig = MkConfig
+defaultHTMLConfig : Config
+defaultHTMLConfig = MkConfig
+  { font = #"\ttfamily"#
+  , datacons = MkCategory
+    { style  = ""
+    , colour = "darkred"
+    }
+  , typecons = MkCategory
+    { style  = ""
+    , colour = "blue"
+    }
+  , bound = MkCategory
+    { style  = ""
+    , colour = "black"
+    }
+  , function = MkCategory
+    { style  = ""
+    , colour = "darkgreen"
+    }
+  , keyword = MkCategory
+    { style  = "text-decoration: underline;"
+    , colour = ""
+    }
+  , comment = MkCategory
+    { style  = ""
+    , colour = "#b22222"
+    }
+  , hole = MkCategory
+    { style  = "font-weight: bold;"
+    , colour = "yellow"
+    }
+  , namespce = MkCategory
+    { style = "font-style: italic;"
+    , colour = "black"
+    }
+  , postulte = MkCategory
+    { style = "font-weight: bold;"
+    , colour = "red"
+    }
+  , aModule  = MkCategory
+    { style = "font-style: italic;"
+    , colour = "black"
+    }
+  }
+
+export
+defaultLatexConfig : Config
+defaultLatexConfig = MkConfig
   { font = #"\ttfamily"#
   , datacons = MkCategory
     { style  = ""
@@ -108,16 +155,35 @@ defaultConfig = MkConfig
 %runElab (deriveFromDhall Record `{ Category })
 %runElab (deriveFromDhall Record `{ Config })
 
+public export
+data Backend = LaTeX | HTML
+
 export
-getConfiguration : (configFile : Maybe String) -> IO Config
-getConfiguration Nothing = pure defaultConfig
-getConfiguration (Just filename) = do
+defaultConfig : Backend -> Config
+defaultConfig LaTeX = defaultLatexConfig
+defaultConfig HTML  = defaultHTMLConfig
+
+export
+getConfiguration : Backend -> (configFile : Maybe String) -> IO Config
+getConfiguration backend Nothing = pure $ defaultConfig backend
+getConfiguration backend (Just filename) = do
   Right config <- liftIOEither (deriveFromDhallString {ty = Config} filename)
   | Left err => do putStrLn  """
                      Error while parsing configuration file \{filename}:
                      \{show err}
                      Using default configuration instead.
                      """
-                   pure defaultConfig
+                   pure $ defaultConfig backend
 
   pure config
+
+
+public export
+record Driver where
+  constructor MkDriver
+  line        : ((width, lineNumber : Nat) -> String, String)
+  escape      : Char -> List Char
+  annotate    : Maybe Decoration -> String -> String
+  standalone  : (String, String)
+  inlineMacro : (String -> String, String)
+  blockMacro  : (String -> String, String)

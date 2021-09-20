@@ -18,6 +18,7 @@ modules
   , Katla.Config
   , Katla.CLI
   , Katla.Engine
+  , Katla.HTML
   , Katla.LaTeX
 
 
