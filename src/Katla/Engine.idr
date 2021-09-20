@@ -13,6 +13,8 @@ import Data.String
 import Data.SnocList
 
 import Katla.Config
+import Katla.LaTeX
+import Katla.HTML
 
 
 {- Relies on the fact that PosMap is an efficient mapping from position:
@@ -200,11 +202,13 @@ exit : IO (Either (Engine.Error a) b)
 exit = pure (Left ReportedError)
 
 export
-setupFiles : (mconfig : Maybe String) ->
-  (msourcefile, mmetadata : String) -> (moutput : Maybe String) ->
+setupFiles : Backend ->
+  (mconfig : Maybe String) ->
+  (msourcefile, mmetadata : String) ->
+  (moutput : Maybe String) ->
   IO (Either (Error Void) FileHandles)
-setupFiles mconfig filename metadata moutput = do
-  config <- getConfiguration mconfig
+setupFiles backend mconfig filename metadata moutput = do
+  config <- getConfiguration backend mconfig
   Right source <- openFile filename  Read
   | Left err => do putStrLn "Couldn't open source file: \{filename}."
                    exit
@@ -234,8 +238,12 @@ data Snippet
 (Raw mrange          ).listing = mrange
 (Macro (_, _, mrange)).listing = mrange
 
+mkDriver : Backend -> (Config -> Driver)
+mkDriver LaTeX = LaTeX.mkDriver
+mkDriver HTML  = HTML.mkDriver
+
 export
-katla : (mkDriver : Config -> Driver) ->
+katla : (backend : Backend) ->
         (snippet : Maybe Snippet) ->
         (mconfig : Maybe String) ->
         (msourcefile, mmetadata, moutput : Maybe String) ->
@@ -246,8 +254,8 @@ katla _ _       _       Nothing _       _
 katla _ _       _       _       Nothing _
   = putStrLn "Expecting metadata file to output."
 -- Generate a fully formed file
-katla mkDriver Nothing mconfig (Just filename) (Just metadata) moutput = do
-  Right files <- setupFiles mconfig filename metadata moutput
+katla backend Nothing mconfig (Just filename) (Just metadata) moutput = do
+  Right files <- setupFiles backend mconfig filename metadata moutput
     | Left ReportedError => pure ()
 
   let error : String -> IO ()
@@ -255,7 +263,7 @@ katla mkDriver Nothing mconfig (Just filename) (Just metadata) moutput = do
                      closeFile files.output
                      exitFailure
 
-  let driver = mkDriver files.config
+  let driver = mkDriver backend files.config
   let (standalonePre, standalonePost) = driver.standalone
 
   Right _ <- fPutStrLn files.output standalonePre
@@ -265,8 +273,8 @@ katla mkDriver Nothing mconfig (Just filename) (Just metadata) moutput = do
     | Left err => error "generating preamble: \{show err}"
   closeFile files.output
 -- Generate only the listing code
-katla mkDriver (Just snippet) mconfig (Just filename) (Just metadata) moutput = do
-  Right files <- setupFiles mconfig filename metadata moutput
+katla backend (Just snippet) mconfig (Just filename) (Just metadata) moutput = do
+  Right files <- setupFiles backend mconfig filename metadata moutput
     | Left ReportedError => exitFailure
 
   let error : String -> IO ()
@@ -274,7 +282,7 @@ katla mkDriver (Just snippet) mconfig (Just filename) (Just metadata) moutput = 
                      closeFile files.output
                      exitFailure
 
-  let driver = mkDriver files.config
+  let driver = mkDriver backend files.config
   case snippet of
     Raw _ => pure ()
     Macro (name, inline, mrange) => do -- TODO: validate macro name, perhaps when parsing

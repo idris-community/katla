@@ -20,14 +20,15 @@ annotate Nothing    s = s
 annotate (Just dec) s = apply (convert dec) s
   where
     convert : Decoration -> String
-    convert (Typ      ) = "IdrisType"
-    convert (Function ) = "IdrisFunction"
-    convert (Data     ) = "IdrisData"
-    convert (Keyword  ) = "IdrisKeyword"
-    convert (Bound    ) = "IdrisBound"
-    convert (Namespace) = "IdrisNamespace"
-    convert (Postulate) = "IdrisPostulate"
-    convert (Module   ) = "IdrisModule"
+    convert Typ       = "IdrisType"
+    convert Function  = "IdrisFunction"
+    convert Data      = "IdrisData"
+    convert Keyword   = "IdrisKeyword"
+    convert Bound     = "IdrisBound"
+    convert Namespace = "IdrisNamespace"
+    convert Postulate = "IdrisPostulate"
+    convert Module    = "IdrisModule"
+    convert Comment   = "IdrisComment"
 
     apply : String -> String -> String
     apply f a = "\\\{f}{\{a}}"
@@ -162,8 +163,8 @@ preambleCmd = MkCommand
   }
 
 public export
-initCmd : Command "init"
-initCmd = MkCommand
+initLatexCmd : Command "init"
+initLatexCmd = MkCommand
   { description = "Generate preamble configuration file"
   , subcommands = []
   , modifiers = []
@@ -179,7 +180,7 @@ preambleExec moutput configFile = do
               Error while opening preamble file \{maybe "stdout" id moutput}:
               \{show err}
               """
-  config <- getConfiguration configFile
+  config <- getConfiguration LaTeX configFile
   Right () <- fPutStr file $ laTeXHeader config
   | Left err => putStrLn """
       Error while writing preamble file \{maybe "stdout" id moutput}:
@@ -207,5 +208,5 @@ initExec moutput = do
   closeFile file
 
 export
-init : (ParsedCommand _ LaTeX.initCmd) -> IO ()
+init : (ParsedCommand _ LaTeX.initLatexCmd) -> IO ()
 init parsed = initExec parsed.arguments

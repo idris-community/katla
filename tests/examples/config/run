@@ -1,8 +1,8 @@
 rm -rf temp
 mkdir temp
 # Test Katla
-$1 preamble --config ./colour-blind.dhall | tee temp/katla-preamble.tex
-$1 preamble --config ./colour-blind.dhall temp/katla-preamble-direct.tex
+$1 latex preamble --config ./colour-blind.dhall | tee temp/katla-preamble.tex
+$1 latex preamble --config ./colour-blind.dhall temp/katla-preamble-direct.tex
 
 # Test generated pdfs
 cp rainbow.tex rainbow-listing.tex colour-blind.sty temp/

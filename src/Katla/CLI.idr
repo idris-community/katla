@@ -32,16 +32,33 @@ macroCmd = MkCommand
   }
 
 export
-katlaCmd : Command "katla"
-katlaCmd = MkCommand
-  { description = """
-      Katla v0.1.
-      LaTeX code listing generator for Idris2
-      """
+htmlCmd : Command "html"
+htmlCmd = MkCommand
+  { description = "HTML backend"
   , subcommands =
-    [ "--help"   ::= basic "Print this help text." none
-    , "preamble" ::= preambleCmd
-    , "init"     ::= initCmd
+    [ "init"     ::= initHTMLCmd
+    ]
+  , modifiers   = ["--config" ::= option """
+                    Preamble configuration file in Dhall format.
+                    Use `init` to generate the defaults config file.
+                    """ filePath
+                  -- TODO: support for snippets
+                  -- , "--snippet" ::= flag """
+                  --   Generates a standalone LaTeX file when unset or just \
+                  --   a code snippet when set.
+                  --   Default: unset/false.
+                  --   """
+                  ]
+  , arguments = lotsOf filePath
+  }
+
+export
+latexCmd : Command "latex"
+latexCmd = MkCommand
+  { description = "LaTeX backend"
+  , subcommands =
+    [ "preamble" ::= preambleCmd
+    , "init"     ::= initLatexCmd
     , "macro"    ::= macroCmd
     ]
   , modifiers   = ["--config" ::= option """
@@ -57,21 +74,36 @@ katlaCmd = MkCommand
   , arguments = lotsOf filePath
   }
 
+export
+katlaCmd : Command "katla"
+katlaCmd = MkCommand
+  { description = """
+      Katla v0.2.
+      Code listing generator for Idris2
+      """
+  , subcommands =
+    [ "--help"   ::= basic "Print this help text." none
+    , "latex"    ::= latexCmd
+    , "html"     ::= htmlCmd
+    ]
+  , modifiers = []
+  , arguments = none
+  }
+
 rawSnippet : Bool -> Maybe Snippet
 rawSnippet False = Nothing
 rawSnippet True  = Just (Raw Nothing)
 
-export
-katlaExec : CLI.katlaCmd ~~> IO ()
-katlaExec =
+katlaLatexExec : CLI.latexCmd ~~> IO ()
+katlaLatexExec =
   [ \parsed => case parsed.arguments of
        Just [src, md, output] =>
-         katla HTML.mkDriver
+         katla LaTeX
                (rawSnippet $ parsed.modifiers.project "--snippet")
                (parsed.modifiers.project "--config")
                (Just src) (Just md) (Just output)
        Just [src, md]         =>
-         katla HTML.mkDriver
+         katla LaTeX
                (rawSnippet $ parsed.modifiers.project "--snippet")
                (parsed.modifiers.project "--config")
                (Just src) (Just md) Nothing
@@ -79,12 +111,12 @@ katlaExec =
   , "macro"   ::=
     [\parsed => case parsed.arguments of
       Just [name, src, md, output] =>
-        katla HTML.mkDriver
+        katla LaTeX
               (Just $ Macro (name, False, Nothing))
               Nothing
               (Just src) (Just md) (Just output)
       Just [name, src, md, output, offset, before, after] =>
-        katla HTML.mkDriver
+        katla LaTeX
               (Just $ Macro (name, False, Just $ RowRangeByOffset
                                     { offset = cast offset - 1
                                     , before = cast before
@@ -92,7 +124,7 @@ katlaExec =
               Nothing
               (Just src) (Just md) (Just output)
       Just [name, src, md, offset, before, after] =>
-        katla HTML.mkDriver
+        katla LaTeX
               (Just $ Macro (name, False, Just $ RowRangeByOffset
                                     { offset = cast offset - 1
                                     , before = cast before
@@ -101,14 +133,14 @@ katlaExec =
               (Just src) (Just md) Nothing
 
       Just [name, src, md] =>
-        katla HTML.mkDriver
+        katla LaTeX
               (Just $ Macro (name, False, Nothing))
               Nothing
               (Just src) (Just md) Nothing
       _ => putStrLn katlaCmd.usage
     , "inline" ::= [\parsed => case parsed.arguments of
       Just [name, src, md, output, offset, line, startCol, endCol] =>
-        katla HTML.mkDriver
+        katla LaTeX
               (Just $ Macro (name, True, Just (RangeByOffsetAndCols
                                     { offset = cast offset - 1
                                     , after  = cast line
@@ -118,7 +150,7 @@ katlaExec =
               Nothing
               (Just src) (Just md) (Just output)
       Just [name, src, md,         offset, line, startCol, endCol] => do
-        katla HTML.mkDriver
+        katla LaTeX
               (Just $ Macro (name, True, Just (RangeByOffsetAndCols
                                     { offset = cast offset - 1
                                     , after  = cast line
@@ -130,7 +162,32 @@ katlaExec =
       _ => putStrLn katlaCmd.usage
       ]
     ]
-  , "--help"  ::= [const $ putStrLn katlaCmd.usage]
   , "preamble" ::= [preamble]
-  , "init"     ::= [init]
+  , "init"     ::= [LaTeX.init]
+  ]
+
+katlaHTMLExec : CLI.htmlCmd ~~> IO ()
+katlaHTMLExec =
+  [ \parsed => case parsed.arguments of
+       Just [src, md, output] =>
+         katla HTML
+               Nothing -- (rawSnippet $ parsed.modifiers.project "--snippet")
+               (parsed.modifiers.project "--config")
+               (Just src) (Just md) (Just output)
+       Just [src, md]         =>
+         katla HTML
+               Nothing -- (rawSnippet $ parsed.modifiers.project "--snippet")
+               (parsed.modifiers.project "--config")
+               (Just src) (Just md) Nothing
+       _ => putStrLn katlaCmd.usage
+  , "init"     ::= [HTML.init]
+  ]
+
+export
+katlaExec : CLI.katlaCmd ~~> IO ()
+katlaExec =
+  [ const (putStrLn katlaCmd.usage)
+  , "--help"   ::= [ const (putStrLn katlaCmd.usage) ]
+  , "latex"    ::= katlaLatexExec
+  , "html"     ::= katlaHTMLExec
   ]

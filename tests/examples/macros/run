@@ -4,19 +4,19 @@ idris2 -c Rainbow.idr
 mkdir temp
 
 # Test Katla
-$1 preamble | tee temp/katla-preamble.tex
-$1 macro ListI ./Rainbow.idr ./build/ttc/Rainbow.ttm \
+$1 latex preamble | tee temp/katla-preamble.tex
+$1 latex macro ListI ./Rainbow.idr ./build/ttc/Rainbow.ttm \
      $(sh ../../scripts/grepline "List1 :" ./Rainbow.idr) \
      1 2 | tee >> temp/rainbow-macros.tex
-$1 macro Rainbow ./Rainbow.idr ./build/ttc/Rainbow.ttm \
+$1 latex macro Rainbow ./Rainbow.idr ./build/ttc/Rainbow.ttm \
      $(sh ../../scripts/grepline "Rainbow n =" ./Rainbow.idr) 1 0 | tee >> temp/rainbow-macros.tex
-$1 macro BelieveMe ./Rainbow.idr ./build/ttc/Rainbow.ttm \
+$1 latex macro BelieveMe ./Rainbow.idr ./build/ttc/Rainbow.ttm \
      $(sh ../../scripts/grepline "m :" ./Rainbow.idr) 0 1 | tee >> temp/rainbow-macros.tex
 
-$1 macro inline mvar ./Rainbow.idr ./build/ttc/Rainbow.ttm \
+$1 latex macro inline mvar ./Rainbow.idr ./build/ttc/Rainbow.ttm \
      $(sh ../../scripts/grepline "m :" ./Rainbow.idr) 0 1 1 | tee >> temp/rainbow-macros.tex
 
-$1 macro inline Cons ./Rainbow.idr ./build/ttc/Rainbow.ttm \
+$1 latex macro inline Cons ./Rainbow.idr ./build/ttc/Rainbow.ttm \
      $(sh ../../scripts/grepline "data List0 : Type where" ./Rainbow.idr) \
      2 4 29 | tee >> temp/rainbow-macros.tex
 

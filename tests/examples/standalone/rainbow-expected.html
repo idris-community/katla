@@ -1,0 +1,82 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="utf-8">
+  <style>
+      .IdrisData {
+      
+      color: darkred
+    }
+    .IdrisType {
+      
+      color: blue
+    }
+    .IdrisBound {
+      
+      color: black
+    }
+    .IdrisFunction {
+      
+      color: darkgreen
+    }
+    .IdrisKeyword {
+      text-decoration: underline;
+      color: 
+    }
+    .IdrisImplicit {
+      
+      color: black
+    }
+    .IdrisComment {
+      
+      color: #b22222
+    }
+    .IdrisNamespace {
+      font-style: italic;
+      color: black
+    }
+    .IdrisPostulate {
+      font-weight: bold;
+      color: red
+    }
+    .IdrisModule {
+      font-style: italic;
+      color: black
+    }
+  </style>
+</head>
+<body>
+<code>
+namespace&nbsp;<span class="IdrisNamespace">L0</span><br />
+&nbsp;&nbsp;<span class="IdrisKeyword">public</span>&nbsp;<span class="IdrisKeyword">export</span><br />
+&nbsp;&nbsp;<span class="IdrisKeyword">data</span>&nbsp;<span class="IdrisType">List0</span>&nbsp;<span class="IdrisKeyword">:</span>&nbsp;<span class="IdrisType">Type</span><br />
+<br />
+<br />
+namespace&nbsp;<span class="IdrisNamespace">L1</span><br />
+&nbsp;&nbsp;<span class="IdrisKeyword">public</span>&nbsp;<span class="IdrisKeyword">export</span><br />
+&nbsp;&nbsp;<span class="IdrisKeyword">data</span>&nbsp;<span class="IdrisType">List1</span>&nbsp;<span class="IdrisKeyword">:</span>&nbsp;<span class="IdrisType">Type</span>&nbsp;<span class="IdrisKeyword">where</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="IdrisData">Nil</span>&nbsp;<span class="IdrisKeyword">:</span>&nbsp;<span class="IdrisType">List1</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="IdrisData">Cons1</span>&nbsp;<span class="IdrisKeyword">:</span>&nbsp;<span class="IdrisType">Nat</span>&nbsp;<span class="IdrisKeyword">-&gt;</span>&nbsp;<span class="IdrisType">List0</span>&nbsp;<span class="IdrisKeyword">-&gt;</span>&nbsp;<span class="IdrisType">List1</span><br />
+<br />
+&nbsp;&nbsp;<span class="IdrisKeyword">public</span>&nbsp;<span class="IdrisKeyword">export</span><br />
+&nbsp;&nbsp;<span class="IdrisFunction">(::)</span>&nbsp;<span class="IdrisKeyword">:</span>&nbsp;<span class="IdrisType">Nat</span>&nbsp;<span class="IdrisKeyword">-&gt;</span>&nbsp;<span class="IdrisType">List0</span>&nbsp;<span class="IdrisKeyword">-&gt;</span>&nbsp;<span class="IdrisType">List1</span><br />
+&nbsp;&nbsp;<span class="IdrisFunction">(::)</span>&nbsp;<span class="IdrisKeyword">=</span>&nbsp;<span class="IdrisData">Cons1</span><br />
+<br />
+namespace&nbsp;<span class="IdrisNamespace">L2</span><br />
+&nbsp;&nbsp;<span class="IdrisKeyword">public</span>&nbsp;<span class="IdrisKeyword">export</span><br />
+&nbsp;&nbsp;<span class="IdrisKeyword">data</span>&nbsp;<span class="IdrisType">(::)</span>&nbsp;<span class="IdrisKeyword">:</span>&nbsp;<span class="IdrisType">Nat</span>&nbsp;<span class="IdrisKeyword">-&gt;</span>&nbsp;<span class="IdrisType">List0</span>&nbsp;<span class="IdrisKeyword">-&gt;</span>&nbsp;<span class="IdrisType">Type</span>&nbsp;<span class="IdrisKeyword">where</span><br />
+<br />
+namespace&nbsp;<span class="IdrisNamespace">L0</span><br />
+&nbsp;&nbsp;<span class="IdrisKeyword">public</span>&nbsp;<span class="IdrisKeyword">export</span><br />
+&nbsp;&nbsp;<span class="IdrisKeyword">data</span>&nbsp;<span class="IdrisType">List0</span>&nbsp;<span class="IdrisKeyword">:</span>&nbsp;<span class="IdrisType">Type</span>&nbsp;<span class="IdrisKeyword">where</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="IdrisData">Nil</span>&nbsp;<span class="IdrisKeyword">:</span>&nbsp;<span class="IdrisType">List0</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="IdrisData">(::)</span>&nbsp;<span class="IdrisKeyword">:</span>&nbsp;<span class="IdrisType">Nat</span>&nbsp;<span class="IdrisKeyword">-&gt;</span><span class="IdrisType">Type</span>&nbsp;<span class="IdrisKeyword">-&gt;</span>&nbsp;<span class="IdrisType">List0</span><br />
+<br />
+<span class="IdrisFunction">m</span>&nbsp;<span class="IdrisKeyword">:</span>&nbsp;<span class="IdrisType">Nat</span><br />
+<span class="IdrisFunction">m</span>&nbsp;<span class="IdrisKeyword">=</span>&nbsp;<span class="IdrisPostulate">believe_me</span>&nbsp;<span class="IdrisData">%MkWorld</span><br />
+<br />
+<span class="IdrisFunction">Rainbow</span>&nbsp;<span class="IdrisKeyword">:</span>&nbsp;<span class="IdrisType">Nat</span>&nbsp;<span class="IdrisKeyword">-&gt;</span>&nbsp;<span class="IdrisType">Type</span><br />
+<span class="IdrisFunction">Rainbow</span>&nbsp;<span class="IdrisBound">n</span>&nbsp;<span class="IdrisKeyword">=</span>&nbsp;&nbsp;<span class="IdrisType">[</span>&nbsp;<span class="IdrisBound">n</span>&nbsp;<span class="IdrisData">,</span>&nbsp;<span class="IdrisFunction">m</span>&nbsp;<span class="IdrisType">,</span>&nbsp;<span class="IdrisBound">n</span>&nbsp;<span class="IdrisData">]</span><br />
+<br />
+</code>
+</body>
+</html>

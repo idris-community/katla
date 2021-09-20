@@ -87,7 +87,7 @@ defaultHTMLConfig = MkConfig
     }
   , comment = MkCategory
     { style  = ""
-    , colour = "darkorange"
+    , colour = "#b22222"
     }
   , hole = MkCategory
     { style  = "font-weight: bold;"
@@ -155,17 +155,25 @@ defaultLatexConfig = MkConfig
 %runElab (deriveFromDhall Record `{ Category })
 %runElab (deriveFromDhall Record `{ Config })
 
+public export
+data Backend = LaTeX | HTML
+
 export
-getConfiguration : (configFile : Maybe String) -> IO Config
-getConfiguration Nothing = pure defaultHTMLConfig
-getConfiguration (Just filename) = do
+defaultConfig : Backend -> Config
+defaultConfig LaTeX = defaultLatexConfig
+defaultConfig HTML  = defaultHTMLConfig
+
+export
+getConfiguration : Backend -> (configFile : Maybe String) -> IO Config
+getConfiguration backend Nothing = pure $ defaultConfig backend
+getConfiguration backend (Just filename) = do
   Right config <- liftIOEither (deriveFromDhallString {ty = Config} filename)
   | Left err => do putStrLn  """
                      Error while parsing configuration file \{filename}:
                      \{show err}
                      Using default configuration instead.
                      """
-                   pure defaultHTMLConfig
+                   pure $ defaultConfig backend
 
   pure config
 
