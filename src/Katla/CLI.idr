@@ -9,6 +9,11 @@ import Katla.Engine
 
 %default covering
 
+failWithUsage : {nm : _} -> Command nm -> IO ()
+failWithUsage cmd
+  = do putStrLn cmd.usage
+       exitFailure
+
 export
 inlineCmd : Command "inline"
 inlineCmd = MkCommand
@@ -107,7 +112,7 @@ katlaLatexExec =
                (rawSnippet $ parsed.modifiers.project "--snippet")
                (parsed.modifiers.project "--config")
                (Just src) (Just md) Nothing
-       _ => putStrLn katlaCmd.usage
+       _ => failWithUsage latexCmd
   , "macro"   ::=
     [\parsed => case parsed.arguments of
       Just [name, src, md, output] =>
@@ -137,7 +142,7 @@ katlaLatexExec =
               (Just $ Macro (name, False, Nothing))
               Nothing
               (Just src) (Just md) Nothing
-      _ => putStrLn katlaCmd.usage
+      _ => failWithUsage latexCmd
     , "inline" ::= [\parsed => case parsed.arguments of
       Just [name, src, md, output, offset, line, startCol, endCol] =>
         katla LaTeX
@@ -159,7 +164,7 @@ katlaLatexExec =
                                     })))
               Nothing
               (Just src) (Just md) Nothing
-      _ => putStrLn katlaCmd.usage
+      _ => failWithUsage latexCmd
       ]
     ]
   , "preamble" ::= [preamble]
@@ -179,14 +184,14 @@ katlaHTMLExec =
                Nothing -- (rawSnippet $ parsed.modifiers.project "--snippet")
                (parsed.modifiers.project "--config")
                (Just src) (Just md) Nothing
-       _ => putStrLn katlaCmd.usage
+       _ => failWithUsage htmlCmd
   , "init"     ::= [HTML.init]
   ]
 
 export
 katlaExec : CLI.katlaCmd ~~> IO ()
 katlaExec =
-  [ const (putStrLn katlaCmd.usage)
+  [ const (failWithUsage katlaCmd)
   , "--help"   ::= [ const (putStrLn katlaCmd.usage) ]
   , "latex"    ::= katlaLatexExec
   , "html"     ::= katlaHTMLExec
