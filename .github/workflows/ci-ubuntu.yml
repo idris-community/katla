@@ -24,9 +24,9 @@ on:
 ########################################################################
 
 env:
-  IDRIS2_COMMIT: a0846af5fa60b3cb48a261b90660fc2f9a896d18
+  IDRIS2_COMMIT: 62237f74ea199990f1dd13859e387ae3d9c870e8
   COLLIE_COMMIT: ed2eda5e04fbd02a7728e915d396e14cc7ec298e
-  IDRALL_COMMIT: b85981228d2c46cea292beeab87ae4c2f8a28ccc
+  IDRALL_COMMIT: 8dfb3275948e85f0da9cfae46f94a652872c8126
   SCHEME: scheme
 
 ########################################################################
