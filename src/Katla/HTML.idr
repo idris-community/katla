@@ -10,9 +10,9 @@ import Katla.Config
 import Libraries.Text.PrettyPrint.Prettyprinter.Render.HTML as Lib
 
 export
-escapeHTML : Char -> List Char
-escapeHTML ' ' = unpack "&nbsp;"
-escapeHTML c = unpack (htmlEscape $ cast c)
+escapeHTML : Config -> Char -> List Char
+escapeHTML config ' ' = unpack config.space
+escapeHTML config c = unpack (htmlEscape $ cast c)
 
 export
 annotate : Maybe Decoration -> String -> String
@@ -146,7 +146,7 @@ mkDriver config = MkDriver
         desc = concat (replicate (minus wdth (length ln)) "&nbsp;" ++ [ln]) in
     ##"<a href="#\##{lineID}" id="\##{lineID}" class="IdrisLineNumber"> \##{desc} | </a>"##
   , "<br />")
-  escapeHTML
+  (escapeHTML config)
   annotate
   (standalonePre config, standalonePost)
   (makeInlineMacroPre, makeInlineMacroPost)

@@ -1,4 +1,5 @@
-{ font = "\\ttfamily"
+{ font  = "\\ttfamily"
+, space = " "
 , datacons = { style  = ""
              , colour = "IndianRed1"}
 , typecons = { style  = ""
@@ -22,8 +23,8 @@
 }
 \usepackage{fancyvrb}
 \usepackage[x11names]{xcolor}
-
 \newcommand{\Katla}                [2][]{\VerbatimInput[commandchars=\\\{\}#1]{#2}}
+\newcommand{\KatlaSpace}              { }
 \newcommand{\IdrisHlightFont}         {\ttfamily}
 \newcommand{\IdrisHlightStyleData}    {}
 \newcommand{\IdrisHlightStyleType}    {}

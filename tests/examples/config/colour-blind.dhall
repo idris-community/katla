@@ -1,4 +1,5 @@
 { font = "\\ttfamily"
+, space = "\\textvisiblespace"
 , datacons = { style  = ""
              , colour = "cb-burgundy"}
 , typecons = { style  = ""

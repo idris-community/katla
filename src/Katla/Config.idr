@@ -19,7 +19,7 @@ record Category where
 public export
 record Config where
   constructor MkConfig
-  font : String
+  font, space : String
   datacons : Category
   typecons : Category
   bound    : Category
@@ -46,7 +46,8 @@ namespace Cat
 export
 (.toString) : Config -> String
 conf.toString = """
-{ font = \{show conf.font}
+{ font  = \{show conf.font}
+, space = \{show conf.space}
 \{conf.datacons.toString ", datacons" {prefixLength = length "datacons"}}
 \{conf.typecons.toString ", typecons" {prefixLength = length "datacons"}}
 \{conf.bound   .toString ", bound"    {prefixLength = length "datacons"}}
@@ -65,6 +66,7 @@ export
 defaultHTMLConfig : Config
 defaultHTMLConfig = MkConfig
   { font = #"\ttfamily"#
+  , space = "&nbsp;"
   , datacons = MkCategory
     { style  = ""
     , colour = "darkred"
@@ -111,6 +113,7 @@ export
 defaultLatexConfig : Config
 defaultLatexConfig = MkConfig
   { font = #"\ttfamily"#
+  , space = #" "#
   , datacons = MkCategory
     { style  = ""
     , colour = "IndianRed1"
