@@ -12,7 +12,7 @@ escapeLatex : Char -> List Char
 escapeLatex '\\' = fastUnpack "\\textbackslash{}"
 escapeLatex '{'  = fastUnpack "\\{"
 escapeLatex '}'  = fastUnpack "\\}"
-escapeLatex ' '  = fastUnpack "\\KatlaSpace"
+escapeLatex ' '  = fastUnpack "\\KatlaSpace{}"
 escapeLatex x    = [x]
 
 export
