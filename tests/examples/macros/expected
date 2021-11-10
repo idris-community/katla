@@ -1,8 +1,8 @@
 1/1: Building Rainbow (Rainbow.idr)
 \usepackage{fancyvrb}
 \usepackage[x11names]{xcolor}
-
 \newcommand{\Katla}                [2][]{\VerbatimInput[commandchars=\\\{\}#1]{#2}}
+\newcommand{\KatlaSpace}              { }
 \newcommand{\IdrisHlightFont}         {\ttfamily}
 \newcommand{\IdrisHlightStyleData}    {}
 \newcommand{\IdrisHlightStyleType}    {}

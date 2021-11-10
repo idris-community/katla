@@ -12,6 +12,7 @@ escapeLatex : Char -> List Char
 escapeLatex '\\' = fastUnpack "\\textbackslash{}"
 escapeLatex '{'  = fastUnpack "\\{"
 escapeLatex '}'  = fastUnpack "\\}"
+escapeLatex ' '  = fastUnpack "\\KatlaSpace"
 escapeLatex x    = [x]
 
 export
@@ -38,8 +39,8 @@ laTeXHeader : Config -> String
 laTeXHeader cfg =  """
 \\usepackage{fancyvrb}
 \\usepackage[x11names]{xcolor}
-
 \\newcommand{\\Katla}                [2][]{\\VerbatimInput[commandchars=\\\\\\{\\}#1]{#2}}
+\\newcommand{\\KatlaSpace}              {\{cfg.space}}
 \\newcommand{\\IdrisHlightFont}         {\{cfg.font}}
 \\newcommand{\\IdrisHlightStyleData}    {\{cfg.datacons .style}}
 \\newcommand{\\IdrisHlightStyleType}    {\{cfg.typecons .style}}

@@ -1,7 +1,7 @@
 \usepackage{fancyvrb}
 \usepackage[x11names]{xcolor}
-
 \newcommand{\Katla}                [2][]{\VerbatimInput[commandchars=\\\{\}#1]{#2}}
+\newcommand{\KatlaSpace}              { }
 \newcommand{\IdrisHlightFont}         {\ttfamily}
 \newcommand{\IdrisHlightStyleData}    {}
 \newcommand{\IdrisHlightStyleType}    {}
@@ -32,7 +32,7 @@
       \IdrisHlightStyleHole\IdrisHlightFont%
       #1}}}
 
-\newcommand{\RawIdrisHighlight}[3]{{\textcolor{#1}{#2\IdrisHlightFont#3}}}
+\newcommand{\RawIdrisHighlight}[3]{{\textcolor{#1}{\IdrisHlightFont#2{#3}}}}
 
 \newcommand{\IdrisData}[1]{\RawIdrisHighlight{\IdrisHlightColourData}{\IdrisHlightStyleData}{#1}}
 \newcommand{\IdrisType}[1]{\RawIdrisHighlight{\IdrisHlightColourType}{\IdrisHlightStyleType}{#1}}
