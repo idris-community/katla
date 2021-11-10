@@ -1,33 +1,33 @@
 1/1: Building Rainbow (Rainbow.idr)
-namespace\KatlaSpace\IdrisNamespace{L0}
-\KatlaSpace\KatlaSpace\IdrisKeyword{public}\KatlaSpace\IdrisKeyword{export}
-\KatlaSpace\KatlaSpace\IdrisKeyword{data}\KatlaSpace\IdrisType{List0}\KatlaSpace\IdrisKeyword{:}\KatlaSpace\IdrisType{Type}
+namespace\KatlaSpace{}\IdrisNamespace{L0}
+\KatlaSpace{}\KatlaSpace{}\IdrisKeyword{public}\KatlaSpace{}\IdrisKeyword{export}
+\KatlaSpace{}\KatlaSpace{}\IdrisKeyword{data}\KatlaSpace{}\IdrisType{List0}\KatlaSpace{}\IdrisKeyword{:}\KatlaSpace{}\IdrisType{Type}
 
 
-namespace\KatlaSpace\IdrisNamespace{L1}
-\KatlaSpace\KatlaSpace\IdrisKeyword{public}\KatlaSpace\IdrisKeyword{export}
-\KatlaSpace\KatlaSpace\IdrisKeyword{data}\KatlaSpace\IdrisType{List1}\KatlaSpace\IdrisKeyword{:}\KatlaSpace\IdrisType{Type}\KatlaSpace\IdrisKeyword{where}
-\KatlaSpace\KatlaSpace\KatlaSpace\KatlaSpace\IdrisData{Nil}\KatlaSpace\IdrisKeyword{:}\KatlaSpace\IdrisType{List1}
-\KatlaSpace\KatlaSpace\KatlaSpace\KatlaSpace\IdrisData{Cons1}\KatlaSpace\IdrisKeyword{:}\KatlaSpace\IdrisType{Nat}\KatlaSpace\IdrisKeyword{->}\KatlaSpace\IdrisType{List0}\KatlaSpace\IdrisKeyword{->}\KatlaSpace\IdrisType{List1}
+namespace\KatlaSpace{}\IdrisNamespace{L1}
+\KatlaSpace{}\KatlaSpace{}\IdrisKeyword{public}\KatlaSpace{}\IdrisKeyword{export}
+\KatlaSpace{}\KatlaSpace{}\IdrisKeyword{data}\KatlaSpace{}\IdrisType{List1}\KatlaSpace{}\IdrisKeyword{:}\KatlaSpace{}\IdrisType{Type}\KatlaSpace{}\IdrisKeyword{where}
+\KatlaSpace{}\KatlaSpace{}\KatlaSpace{}\KatlaSpace{}\IdrisData{Nil}\KatlaSpace{}\IdrisKeyword{:}\KatlaSpace{}\IdrisType{List1}
+\KatlaSpace{}\KatlaSpace{}\KatlaSpace{}\KatlaSpace{}\IdrisData{Cons1}\KatlaSpace{}\IdrisKeyword{:}\KatlaSpace{}\IdrisType{Nat}\KatlaSpace{}\IdrisKeyword{->}\KatlaSpace{}\IdrisType{List0}\KatlaSpace{}\IdrisKeyword{->}\KatlaSpace{}\IdrisType{List1}
 
-\KatlaSpace\KatlaSpace\IdrisKeyword{public}\KatlaSpace\IdrisKeyword{export}
-\KatlaSpace\KatlaSpace\IdrisFunction{(::)}\KatlaSpace\IdrisKeyword{:}\KatlaSpace\IdrisType{Nat}\KatlaSpace\IdrisKeyword{->}\KatlaSpace\IdrisType{List0}\KatlaSpace\IdrisKeyword{->}\KatlaSpace\IdrisType{List1}
-\KatlaSpace\KatlaSpace\IdrisFunction{(::)}\KatlaSpace\IdrisKeyword{=}\KatlaSpace\IdrisData{Cons1}
+\KatlaSpace{}\KatlaSpace{}\IdrisKeyword{public}\KatlaSpace{}\IdrisKeyword{export}
+\KatlaSpace{}\KatlaSpace{}\IdrisFunction{(::)}\KatlaSpace{}\IdrisKeyword{:}\KatlaSpace{}\IdrisType{Nat}\KatlaSpace{}\IdrisKeyword{->}\KatlaSpace{}\IdrisType{List0}\KatlaSpace{}\IdrisKeyword{->}\KatlaSpace{}\IdrisType{List1}
+\KatlaSpace{}\KatlaSpace{}\IdrisFunction{(::)}\KatlaSpace{}\IdrisKeyword{=}\KatlaSpace{}\IdrisData{Cons1}
 
-namespace\KatlaSpace\IdrisNamespace{L2}
-\KatlaSpace\KatlaSpace\IdrisKeyword{public}\KatlaSpace\IdrisKeyword{export}
-\KatlaSpace\KatlaSpace\IdrisKeyword{data}\KatlaSpace\IdrisType{(::)}\KatlaSpace\IdrisKeyword{:}\KatlaSpace\IdrisType{Nat}\KatlaSpace\IdrisKeyword{->}\KatlaSpace\IdrisType{List0}\KatlaSpace\IdrisKeyword{->}\KatlaSpace\IdrisType{Type}\KatlaSpace\IdrisKeyword{where}
+namespace\KatlaSpace{}\IdrisNamespace{L2}
+\KatlaSpace{}\KatlaSpace{}\IdrisKeyword{public}\KatlaSpace{}\IdrisKeyword{export}
+\KatlaSpace{}\KatlaSpace{}\IdrisKeyword{data}\KatlaSpace{}\IdrisType{(::)}\KatlaSpace{}\IdrisKeyword{:}\KatlaSpace{}\IdrisType{Nat}\KatlaSpace{}\IdrisKeyword{->}\KatlaSpace{}\IdrisType{List0}\KatlaSpace{}\IdrisKeyword{->}\KatlaSpace{}\IdrisType{Type}\KatlaSpace{}\IdrisKeyword{where}
 
-namespace\KatlaSpace\IdrisNamespace{L0}
-\KatlaSpace\KatlaSpace\IdrisKeyword{public}\KatlaSpace\IdrisKeyword{export}
-\KatlaSpace\KatlaSpace\IdrisKeyword{data}\KatlaSpace\IdrisType{List0}\KatlaSpace\IdrisKeyword{:}\KatlaSpace\IdrisType{Type}\KatlaSpace\IdrisKeyword{where}
-\KatlaSpace\KatlaSpace\KatlaSpace\KatlaSpace\IdrisData{Nil}\KatlaSpace\IdrisKeyword{:}\KatlaSpace\IdrisType{List0}
-\KatlaSpace\KatlaSpace\KatlaSpace\KatlaSpace\IdrisData{(::)}\KatlaSpace\IdrisKeyword{:}\KatlaSpace\IdrisType{Nat}\KatlaSpace\IdrisKeyword{->}\IdrisType{Type}\KatlaSpace\IdrisKeyword{->}\KatlaSpace\IdrisType{List0}
+namespace\KatlaSpace{}\IdrisNamespace{L0}
+\KatlaSpace{}\KatlaSpace{}\IdrisKeyword{public}\KatlaSpace{}\IdrisKeyword{export}
+\KatlaSpace{}\KatlaSpace{}\IdrisKeyword{data}\KatlaSpace{}\IdrisType{List0}\KatlaSpace{}\IdrisKeyword{:}\KatlaSpace{}\IdrisType{Type}\KatlaSpace{}\IdrisKeyword{where}
+\KatlaSpace{}\KatlaSpace{}\KatlaSpace{}\KatlaSpace{}\IdrisData{Nil}\KatlaSpace{}\IdrisKeyword{:}\KatlaSpace{}\IdrisType{List0}
+\KatlaSpace{}\KatlaSpace{}\KatlaSpace{}\KatlaSpace{}\IdrisData{(::)}\KatlaSpace{}\IdrisKeyword{:}\KatlaSpace{}\IdrisType{Nat}\KatlaSpace{}\IdrisKeyword{->}\IdrisType{Type}\KatlaSpace{}\IdrisKeyword{->}\KatlaSpace{}\IdrisType{List0}
 
-\IdrisFunction{m}\KatlaSpace\IdrisKeyword{:}\KatlaSpace\IdrisType{Nat}
-\IdrisFunction{m}\KatlaSpace\IdrisKeyword{=}\KatlaSpace\IdrisPostulate{believe_me}\KatlaSpace\IdrisData{%MkWorld}
+\IdrisFunction{m}\KatlaSpace{}\IdrisKeyword{:}\KatlaSpace{}\IdrisType{Nat}
+\IdrisFunction{m}\KatlaSpace{}\IdrisKeyword{=}\KatlaSpace{}\IdrisPostulate{believe_me}\KatlaSpace{}\IdrisData{%MkWorld}
 
-\IdrisFunction{Rainbow}\KatlaSpace\IdrisKeyword{:}\KatlaSpace\IdrisType{Nat}\KatlaSpace\IdrisKeyword{->}\KatlaSpace\IdrisType{Type}
-\IdrisFunction{Rainbow}\KatlaSpace\IdrisBound{n}\KatlaSpace\IdrisKeyword{=}\KatlaSpace\KatlaSpace\IdrisType{[}\KatlaSpace\IdrisBound{n}\KatlaSpace\IdrisData{,}\KatlaSpace\IdrisFunction{m}\KatlaSpace\IdrisType{,}\KatlaSpace\IdrisBound{n}\KatlaSpace\IdrisData{]}
+\IdrisFunction{Rainbow}\KatlaSpace{}\IdrisKeyword{:}\KatlaSpace{}\IdrisType{Nat}\KatlaSpace{}\IdrisKeyword{->}\KatlaSpace{}\IdrisType{Type}
+\IdrisFunction{Rainbow}\KatlaSpace{}\IdrisBound{n}\KatlaSpace{}\IdrisKeyword{=}\KatlaSpace{}\KatlaSpace{}\IdrisType{[}\KatlaSpace{}\IdrisBound{n}\KatlaSpace{}\IdrisData{,}\KatlaSpace{}\IdrisFunction{m}\KatlaSpace{}\IdrisType{,}\KatlaSpace{}\IdrisBound{n}\KatlaSpace{}\IdrisData{]}
 
 Expected: directly writing to file gives the same results
