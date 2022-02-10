@@ -1,10 +1,10 @@
 1/1: Building Rainbow (Rainbow.idr)
-namespace\KatlaSpace{}\IdrisNamespace{L0}
+\IdrisKeyword{namespace}\KatlaSpace{}\IdrisNamespace{L0}
 \KatlaSpace{}\KatlaSpace{}\IdrisKeyword{public}\KatlaSpace{}\IdrisKeyword{export}
 \KatlaSpace{}\KatlaSpace{}\IdrisKeyword{data}\KatlaSpace{}\IdrisType{List0}\KatlaSpace{}\IdrisKeyword{:}\KatlaSpace{}\IdrisType{Type}
 
 
-namespace\KatlaSpace{}\IdrisNamespace{L1}
+\IdrisKeyword{namespace}\KatlaSpace{}\IdrisNamespace{L1}
 \KatlaSpace{}\KatlaSpace{}\IdrisKeyword{public}\KatlaSpace{}\IdrisKeyword{export}
 \KatlaSpace{}\KatlaSpace{}\IdrisKeyword{data}\KatlaSpace{}\IdrisType{List1}\KatlaSpace{}\IdrisKeyword{:}\KatlaSpace{}\IdrisType{Type}\KatlaSpace{}\IdrisKeyword{where}
 \KatlaSpace{}\KatlaSpace{}\KatlaSpace{}\KatlaSpace{}\IdrisData{Nil}\KatlaSpace{}\IdrisKeyword{:}\KatlaSpace{}\IdrisType{List1}
@@ -14,11 +14,11 @@ namespace\KatlaSpace{}\IdrisNamespace{L1}
 \KatlaSpace{}\KatlaSpace{}\IdrisFunction{(::)}\KatlaSpace{}\IdrisKeyword{:}\KatlaSpace{}\IdrisType{Nat}\KatlaSpace{}\IdrisKeyword{->}\KatlaSpace{}\IdrisType{List0}\KatlaSpace{}\IdrisKeyword{->}\KatlaSpace{}\IdrisType{List1}
 \KatlaSpace{}\KatlaSpace{}\IdrisFunction{(::)}\KatlaSpace{}\IdrisKeyword{=}\KatlaSpace{}\IdrisData{Cons1}
 
-namespace\KatlaSpace{}\IdrisNamespace{L2}
+\IdrisKeyword{namespace}\KatlaSpace{}\IdrisNamespace{L2}
 \KatlaSpace{}\KatlaSpace{}\IdrisKeyword{public}\KatlaSpace{}\IdrisKeyword{export}
 \KatlaSpace{}\KatlaSpace{}\IdrisKeyword{data}\KatlaSpace{}\IdrisType{(::)}\KatlaSpace{}\IdrisKeyword{:}\KatlaSpace{}\IdrisType{Nat}\KatlaSpace{}\IdrisKeyword{->}\KatlaSpace{}\IdrisType{List0}\KatlaSpace{}\IdrisKeyword{->}\KatlaSpace{}\IdrisType{Type}\KatlaSpace{}\IdrisKeyword{where}
 
-namespace\KatlaSpace{}\IdrisNamespace{L0}
+\IdrisKeyword{namespace}\KatlaSpace{}\IdrisNamespace{L0}
 \KatlaSpace{}\KatlaSpace{}\IdrisKeyword{public}\KatlaSpace{}\IdrisKeyword{export}
 \KatlaSpace{}\KatlaSpace{}\IdrisKeyword{data}\KatlaSpace{}\IdrisType{List0}\KatlaSpace{}\IdrisKeyword{:}\KatlaSpace{}\IdrisType{Type}\KatlaSpace{}\IdrisKeyword{where}
 \KatlaSpace{}\KatlaSpace{}\KatlaSpace{}\KatlaSpace{}\IdrisData{Nil}\KatlaSpace{}\IdrisKeyword{:}\KatlaSpace{}\IdrisType{List0}
