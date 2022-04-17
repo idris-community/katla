@@ -104,33 +104,73 @@ standalonePre config = """
     }
     </style>
     <script>
-    function handleHash() {
-      if (!location.hash) return
-      let m = location.hash.match(/#(line\\d+)(?:-(line\\d+))?/)
-      if (m) {
-        let start = document.getElementById(m[1])
-        let end = document.getElementById(m[2])
-        if (start) {
-          if (end && end.compareDocumentPosition(start) === 4) {
-            ([start,end] = [end,start])
-          }
-          start.scrollIntoView()
-          let parent = start.parentElement
-          let lines = parent.children
-          let className = ''
-          for (let n = 0; n < lines.length; n++) {
-            let el = lines[n]
-            if (el === start) className = 'IdrisHighlight'
-            el.className = className
-            if (el === end || className && !end) className = ''
-          }
+      function initialize() {
+        function handleHash(ev) {
+            if (!location.hash) return
+            let m = location.hash.match(/#(line\\d+)(?:-(line\\d+))?/)
+            if (m) {
+                let start = document.getElementById(m[1])
+                let end = document.getElementById(m[2])
+                if (start) {
+                    if (end && end.compareDocumentPosition(start) === 4) {
+                        ([start, end] = [end, start])
+                    }
+                    // Only on page load
+                    if (!ev) start.scrollIntoView()
+                    let parent = start.parentElement
+                    let lines = parent.children
+                    let className = ''
+                    for (let n = 0; n < lines.length; n++) {
+                        let el = lines[n]
+                        if (el === start) className = 'IdrisHighlight'
+                        el.className = className
+                        if (el === end || className && !end) className = ''
+                    }
+                }
+            }
         }
-      }
+        let startLine
+        let endLine
+        function handlePointerMove(ev) {
+            if (startLine) {
+                for (let el = document.elementFromPoint(ev.clientX, ev.clientY); el; el = el.parentElement) {
+                    if (el.parentElement === startLine.parentElement) {
+                        if (endLine !== el) {
+                            endLine = el
+                            update()
+                        }
+                        break
+                    }
+                }
+            }
+        }
+        function update(ev) {
+            window.location.hash = startLine === endLine ? startLine.id : startLine.id + '-' + endLine.id
+        }
+        function handlePointerDown(ev) {
+            let target = ev.target
+            if (target.className === 'IdrisLineNumber') {
+                startLine = endLine = target.parentElement
+                window.addEventListener('pointermove', handlePointerMove)
+                update()
+                ev.preventDefault()
+            }
+        }
+        function handlePointerUp(ev) {
+            if (startLine) {
+                update()
+                window.removeEventListener('pointermove', handlePointerMove)
+                startLine = endLine = null
+            }
+        }
+        window.addEventListener('hashchange', handleHash)
+        window.addEventListener('pointerdown', handlePointerDown)
+        window.addEventListener('pointerup', handlePointerUp)
+        handleHash()
     }
-    window.addEventListener('hashchange',handleHash)
     </script>
   </head>
-  <body onload="handleHash()">
+  <body onload="initialize()">
   <code>
   """
 

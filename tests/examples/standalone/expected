@@ -92,7 +92,15 @@
 \end{Verbatim}
 \end{document}
 Expected: directly writing to file gives the same results
-"IdrisLineNumber"> 25 | </a><span class="IdrisFunction">m</span>&nbsp;<span class="IdrisKeyword">:</span>&nbsp;<span class="IdrisType">Nat</span><br />
+ata</span>&nbsp;<span class="IdrisType">(::)</span>&nbsp;<span class="IdrisKeyword">:</span>&nbsp;<span class="IdrisType">Nat</span>&nbsp;<span class="IdrisKeyword">-&gt;</span>&nbsp;<span class="IdrisType">List0</span>&nbsp;<span class="IdrisKeyword">-&gt;</span>&nbsp;<span class="IdrisType">Type</span>&nbsp;<span class="IdrisKeyword">where</span><br />
+< <a href="#line18" id="line18" class="IdrisLineNumber"> 18 | </a><br />
+< <a href="#line19" id="line19" class="IdrisLineNumber"> 19 | </a>namespace&nbsp;<span class="IdrisNamespace">L0</span><br />
+< <a href="#line20" id="line20" class="IdrisLineNumber"> 20 | </a>&nbsp;&nbsp;<span class="IdrisKeyword">public</span>&nbsp;<span class="IdrisKeyword">export</span><br />
+< <a href="#line21" id="line21" class="IdrisLineNumber"> 21 | </a>&nbsp;&nbsp;<span class="IdrisKeyword">data</span>&nbsp;<span class="IdrisType">List0</span>&nbsp;<span class="IdrisKeyword">:</span>&nbsp;<span class="IdrisType">Type</span>&nbsp;<span class="IdrisKeyword">where</span><br />
+< <a href="#line22" id="line22" class="IdrisLineNumber"> 22 | </a>&nbsp;&nbsp;&nbsp;&nbsp;<span class="IdrisData">Nil</span>&nbsp;<span class="IdrisKeyword">:</span>&nbsp;<span class="IdrisType">List0</span><br />
+< <a href="#line23" id="line23" class="IdrisLineNumber"> 23 | </a>&nbsp;&nbsp;&nbsp;&nbsp;<span class="IdrisData">(::)</span>&nbsp;<span class="IdrisKeyword">:</span>&nbsp;<span class="IdrisType">Nat</span>&nbsp;<span class="IdrisKeyword">-&gt;</span><span class="IdrisType">Type</span>&nbsp;<span class="IdrisKeyword">-&gt;</span>&nbsp;<span class="IdrisType">List0</span><br />
+< <a href="#line24" id="line24" class="IdrisLineNumber"> 24 | </a><br />
+< <a href="#line25" id="line25" class="IdrisLineNumber"> 25 | </a><span class="IdrisFunction">m</span>&nbsp;<span class="IdrisKeyword">:</span>&nbsp;<span class="IdrisType">Nat</span><br />
 < <a href="#line26" id="line26" class="IdrisLineNumber"> 26 | </a><span class="IdrisFunction">m</span>&nbsp;<span class="IdrisKeyword">=</span>&nbsp;<span class="IdrisPostulate">believe_me</span>&nbsp;<span class="IdrisData">%MkWorld</span><br />
 < <a href="#line27" id="line27" class="IdrisLineNumber"> 27 | </a><br />
 < <a href="#line28" id="line28" class="IdrisLineNumber"> 28 | </a><span class="IdrisFunction">Rainbow</span>&nbsp;<span class="IdrisKeyword">:</span>&nbsp;<span class="IdrisType">Nat</span>&nbsp;<span class="IdrisKeyword">-&gt;</span>&nbsp;<span class="IdrisType">Type</span><br />
