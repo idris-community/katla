@@ -99,9 +99,30 @@ standalonePre config = """
     .IdrisLineNumber:target {
       color: gray;
     }
+    .IdrisHighlight {
+      background-color: yellow;
+    }
     </style>
+    <script>
+    function handleHash() {
+      if (!location.hash) return
+      let m = location.hash.match(/#(line\\d+)(?:-(line\\d+))?/)
+      if (m) {
+        let [_, start, end] = m
+        let el = document.getElementById(start)
+        if (el) {
+          el.scrollIntoView()
+          for (; el; el.nextElementSibling) {
+            el.className += ' IdrisHighlight'
+            if (!end || el.id == end) break
+            el = el.nextElementSibling
+          }
+        }
+      }
+    }
+    </script>
   </head>
-  <body>
+  <body onload="handleHash()">
   <code>
   """
 
@@ -144,8 +165,8 @@ mkDriver config = MkDriver
     let ln = show ln
         lineID = "line\{ln}"
         desc = concat (replicate (minus wdth (length ln)) "&nbsp;" ++ [ln]) in
-    ##"<a href="#\##{lineID}" id="\##{lineID}" class="IdrisLineNumber"> \##{desc} | </a>"##
-  , "<br />")
+    ##"<div id="\##{lineID}"><a href="#\##{lineID}" class="IdrisLineNumber"> \##{desc} | </a>"##
+  , "</div>")
   (escapeHTML config)
   annotate
   (standalonePre config, standalonePost)
