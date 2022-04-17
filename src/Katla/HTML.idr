@@ -111,6 +111,9 @@ standalonePre config = """
         let start = document.getElementById(m[1])
         let end = document.getElementById(m[2])
         if (start) {
+          if (end && end.compareDocumentPosition(start) === 4) {
+            ([start,end] = [end,start])
+          }
           start.scrollIntoView()
           let parent = start.parentElement
           let lines = parent.children
