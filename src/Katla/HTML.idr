@@ -108,18 +108,23 @@ standalonePre config = """
       if (!location.hash) return
       let m = location.hash.match(/#(line\\d+)(?:-(line\\d+))?/)
       if (m) {
-        let [_, start, end] = m
-        let el = document.getElementById(start)
-        if (el) {
-          el.scrollIntoView()
-          for (; el; el.nextElementSibling) {
-            el.className += ' IdrisHighlight'
-            if (!end || el.id == end) break
-            el = el.nextElementSibling
+        let start = document.getElementById(m[1])
+        let end = document.getElementById(m[2])
+        if (start) {
+          start.scrollIntoView()
+          let parent = start.parentElement
+          let lines = parent.children
+          let className = ''
+          for (let n = 0; n < lines.length; n++) {
+            let el = lines[n]
+            if (el === start) className = 'IdrisHighlight'
+            el.className = className
+            if (el === end || className && !end) className = ''
           }
         }
       }
     }
+    window.addEventListener('hashchange',handleHash)
     </script>
   </head>
   <body onload="handleHash()">
