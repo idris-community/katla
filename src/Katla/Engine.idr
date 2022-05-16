@@ -7,14 +7,19 @@ import Core.Name
 import Core.Core
 import Core.Metadata
 import Libraries.Data.PosMap
+import Libraries.Text.Literate
+import Libraries.Text.Bounded
+import Parser.Unlit
 import Data.List1
 import Data.List
+import Data.Maybe
 import Data.String
 import Data.SnocList
 
 import Katla.Config
-import Katla.LaTeX
 import Katla.HTML
+import Katla.LaTeX
+import Katla.Markdown
 
 
 {- Relies on the fact that PosMap is an efficient mapping from position:
@@ -109,6 +114,48 @@ processLine output meta driver currentDecor currentPos endPos cs currentOutput
                  let c = snocEscape driver.escape [<] c
                  processLine output meta driver decor nextPos endPos rest c
 
+processLines : (output : File)
+           -> (meta : PosMap ASemanticDecoration)
+           -> Driver
+           -> (currentDecor  : Maybe Decoration)
+           -> (currentPos    : Position)
+           -> (remainingLine : List String)
+           -> IO (Maybe Decoration, Position)
+processLines output meta driver currentDecor currentPos [] = pure (currentDecor, currentPos)
+processLines output meta driver currentDecor currentPos (l :: ls) = do
+  (nextDecor, nextPos) <- processLine output meta driver currentDecor currentPos Nothing (unpack l) [<]
+  processLines output meta driver nextDecor nextPos ls
+
+engineLitWithDecor
+  : (output : File)
+  -> (lineNumberWidth : Nat) -- width of the largest line number e.g. 3 for 999
+  -> (meta : PosMap ASemanticDecoration)
+  -> Driver
+  -> List (WithBounds LitToken)
+  -> IO ()
+engineLitWithDecor output lineNumberWidth meta driver [] = pure ()
+engineLitWithDecor output lineNumberWidth meta driver (t :: ts) = do
+  case t.val of
+    CodeBlock _ _ src => do
+      -- src contains both the opening & closing lines of the code block
+      -- we extract the "options" coming after the opening token e.g. "```idris hide"
+      -- and the content of the block
+      let (opts, content) = case lines src of
+                              hd :: tl => (fromMaybe [] (tail' $ words hd), fromMaybe [] (init' tl))
+                              [] => ([], [])
+      unless ("hide" `elem` opts) $ do
+        let (pre, post) = driver.blockMacro
+        -- a code block is opened by a keyword + untilEOL
+        -- so the start of the code block is the beginning of the next line
+        -- TODO: look at `l` to see if there are any options
+        ignore $ fPutStr output (pre "")
+        let pos = bimap (1+) (const 0) (start t)
+        ignore $ processLines output meta driver Nothing pos content
+        ignore $ fPutStr output post
+    Any str => ignore $ fPutStr output str
+    CodeLine _ _ => pure () -- not supported for now
+  engineLitWithDecor output lineNumberWidth meta driver ts
+
 engineWithDecor
   : (input, output : File)
   -> (lineNumberWidth : Nat) -- width of the largest line number e.g. 3 for 999
@@ -192,16 +239,22 @@ engineWithRange input output lineNumberWidth meta driver rowRange currentDecor c
       unless (rowRange.end < nextPos) $
         engineWithRange input output lineNumberWidth meta driver rowRange nextDecor nextPos
 
-
 export
-engine : (input, output : File)
+engine : Backend
+       -> (input, output : File)
        -> (lineNumberWidth : Nat)
        -> (meta : PosMap ASemanticDecoration)
        -> Driver
        -> Position
        -> IO ()
-engine input output lnw meta driver
-  = engineWithDecor input output lnw meta driver Nothing
+engine Markdown input output lnw meta driver pos
+  = do Right content <- fRead input
+         | Left err => pure ()
+       let Right ts = lexLiterate styleCMark content
+         | Left err => pure ()
+       engineLitWithDecor output lnw meta driver ts
+engine _ input output lnw meta driver pos
+  = engineWithDecor input output lnw meta driver Nothing pos
 
 record FileHandles where
   constructor MkHandles
@@ -251,8 +304,9 @@ data Snippet
 (Macro (_, _, mrange)).listing = mrange
 
 mkDriver : Backend -> (Config -> Driver)
+mkDriver HTML = HTML.mkDriver
 mkDriver LaTeX = LaTeX.mkDriver
-mkDriver HTML  = HTML.mkDriver
+mkDriver Markdown = Markdown.mkDriver
 
 export
 katla : (backend : Backend) ->
@@ -283,7 +337,7 @@ katla backend Nothing mconfig (Just filename) (Just metadata) moutput = do
   Right content <- readFile filename
      | Left _  => pure ()
   let lnw = length $ show $ length $ lines content
-  engine files.source files.output lnw files.metadata driver (0,0)
+  engine backend files.source files.output lnw files.metadata driver (0,0)
   Right _ <- fPutStrLn files.output standalonePost
     | Left err => error "generating preamble: \{show err}"
   closeFile files.output
@@ -310,7 +364,7 @@ katla backend (Just snippet) mconfig (Just filename) (Just metadata) moutput = d
       do Right content <- readFile filename
            | Left _  => pure ()
          let lnw = length $ show $ length $ lines content
-         engine files.source files.output lnw files.metadata driver (0,0)
+         engine backend files.source files.output lnw files.metadata driver (0,0)
     Just range =>
       do let lnw = length $ show range.endRow
          engineWithRange files.source files.output lnw files.metadata driver range Nothing (0,0)

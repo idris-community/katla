@@ -37,6 +37,27 @@ macroCmd = MkCommand
   }
 
 export
+markdownCmd : Command "markdown"
+markdownCmd = MkCommand
+  { description = "Markdown backend"
+  , subcommands =
+    [ "init"     ::= initHTMLCmd
+    ]
+  , modifiers   = ["--config" ::= option """
+                    Preamble configuration file in Dhall format.
+                    Use `init` to generate the defaults config file.
+                    """ filePath
+                  -- TODO: support for snippets
+                  -- , "--snippet" ::= flag """
+                  --   Generates a standalone LaTeX file when unset or just \
+                  --   a code snippet when set.
+                  --   Default: unset/false.
+                  --   """
+                  ]
+  , arguments = lotsOf filePath
+  }
+
+export
 htmlCmd : Command "html"
 htmlCmd = MkCommand
   { description = "HTML backend"
@@ -90,6 +111,7 @@ katlaCmd = MkCommand
     [ "--help"   ::= basic "Print this help text." none
     , "latex"    ::= latexCmd
     , "html"     ::= htmlCmd
+    , "markdown" ::= markdownCmd
     ]
   , modifiers = []
   , arguments = none
@@ -171,6 +193,23 @@ katlaLatexExec =
   , "init"     ::= [LaTeX.init]
   ]
 
+katlaMarkdownExec : CLI.markdownCmd ~~> IO ()
+katlaMarkdownExec =
+  [ \parsed => case parsed.arguments of
+       Just [src, md, output] =>
+         katla Markdown
+               Nothing -- (rawSnippet $ parsed.modifiers.project "--snippet")
+               (parsed.modifiers.project "--config")
+               (Just src) (Just md) (Just output)
+       Just [src, md]         =>
+         katla Markdown
+               Nothing -- (rawSnippet $ parsed.modifiers.project "--snippet")
+               (parsed.modifiers.project "--config")
+               (Just src) (Just md) Nothing
+       _ => failWithUsage htmlCmd
+  , "init"     ::= [HTML.init]
+  ]
+
 katlaHTMLExec : CLI.htmlCmd ~~> IO ()
 katlaHTMLExec =
   [ \parsed => case parsed.arguments of
@@ -195,4 +234,5 @@ katlaExec =
   , "--help"   ::= [ const (putStrLn katlaCmd.usage) ]
   , "latex"    ::= katlaLatexExec
   , "html"     ::= katlaHTMLExec
+  , "markdown" ::= katlaMarkdownExec
   ]

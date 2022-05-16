@@ -37,46 +37,46 @@ export
 styleHeader : Config -> String
 styleHeader cfg =  """
     .IdrisData {
-      \{cfg.datacons .style}
+      \{cfg.datacons .style} ;;
       color: \{cfg.datacons .colour}
     }
     .IdrisType {
-      \{cfg.typecons .style}
+      \{cfg.typecons .style} ;;
       color: \{cfg.typecons .colour}
     }
     .IdrisBound {
-      \{cfg.bound .style}
+      \{cfg.bound .style} ;;
       color: \{cfg.bound .colour}
     }
     .IdrisFunction {
-      \{cfg.function .style}
+      \{cfg.function .style} ;;
       color: \{cfg.function .colour}
     }
     .IdrisKeyword {
-      \{cfg.keyword .style}
+      \{cfg.keyword .style} ;;
       color: \{cfg.keyword .colour}
     }
     .IdrisImplicit {
-      \{cfg.bound .style}
+      \{cfg.bound .style} ;;
       color: \{cfg.bound .colour}
     }
     .IdrisComment {
-      \{cfg.comment .style}
+      \{cfg.comment .style} ;;
       color: \{cfg.comment .colour}
     }
     .IdrisNamespace {
-      \{cfg.namespce .style}
+      \{cfg.namespce .style} ;;
       color: \{cfg.namespce .colour}
     }
     .IdrisPostulate {
-      \{cfg.postulte .style}
+      \{cfg.postulte .style} ;;
       color: \{cfg.postulte .colour}
     }
     .IdrisModule {
-      \{cfg.aModule .style}
+      \{cfg.aModule .style} ;;
       color: \{cfg.aModule .colour}
     }
-"""
+    """
 
 export
 standalonePre : Config -> String
@@ -102,7 +102,7 @@ standalonePre config = """
     </style>
   </head>
   <body>
-  <code>
+  <code class="IdrisCode">
   """
 
 export
@@ -116,7 +116,7 @@ standalonePost = """
 export
 makeMacroPre : String -> String
 makeMacroPre name = """
-  <code>
+  <code class="IdrisCode">
   """
 
 export
@@ -128,7 +128,7 @@ makeMacroPost = """
 export
 makeInlineMacroPre : String -> String
 makeInlineMacroPre name = """
-  <code>
+  <code class="IdrisCode">
   """
 
 export
@@ -167,12 +167,12 @@ initExec : (moutput : Maybe String) -> IO ()
 initExec moutput = do
   Right file <- maybe (pure $ Right stdout) (flip openFile WriteTruncate) moutput
   | Left err => putStrLn """
-              Error while opening configuration file \{maybe "stdout" id moutput}:
+              Error while opening configuration file \{fromMaybe "stdout" moutput}:
               \{show err}
               """
   Right () <- fPutStrLn file $ defaultHTMLConfig.toString
   | Left err => putStrLn """
-      Error while writing preamble file \{maybe "stdout" id moutput}:
+      Error while writing preamble file \{fromMaybe "stdout" moutput}:
       \{show err}
       """
   closeFile file
