@@ -11,6 +11,13 @@ import Katla.HTML
 import Libraries.Text.PrettyPrint.Prettyprinter.Render.HTML as Lib
 
 export
+escapeMarkdown : Config -> Char -> List Char
+escapeMarkdown config ' ' = unpack config.space
+escapeMarkdown config '_' = unpack "\\_"
+escapeMarkdown config '*' = unpack "\\*"
+escapeMarkdown config c = unpack (htmlEscape $ cast c)
+
+export
 standalonePre : Config -> String
 standalonePre config = """
   <style>
@@ -26,7 +33,7 @@ export
 mkDriver : Config -> Driver
 mkDriver config = MkDriver
   (\ wdth, ln => "", "<br />")
-  (escapeHTML config)
+  (escapeMarkdown config)
   annotate
   (Markdown.standalonePre config, "")
   (makeInlineMacroPre, makeInlineMacroPost)
