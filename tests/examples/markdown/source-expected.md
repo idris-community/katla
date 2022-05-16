@@ -1,42 +1,32 @@
 <style>
 .IdrisData {
-   ;;
   color: darkred
 }
 .IdrisType {
-   ;;
   color: blue
 }
 .IdrisBound {
-   ;;
   color: black
 }
 .IdrisFunction {
-   ;;
   color: darkgreen
 }
 .IdrisKeyword {
-  text-decoration: underline; ;;
-  color: 
-}
-.IdrisImplicit {
-   ;;
-  color: black
+  text-decoration: underline;
 }
 .IdrisComment {
-   ;;
   color: #b22222
 }
 .IdrisNamespace {
-  font-style: italic; ;;
+  font-style: italic;
   color: black
 }
 .IdrisPostulate {
-  font-weight: bold; ;;
+  font-weight: bold;
   color: red
 }
 .IdrisModule {
-  font-style: italic; ;;
+  font-style: italic;
   color: black
 }
 .IdrisCode {
