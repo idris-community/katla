@@ -58,6 +58,27 @@ markdownCmd = MkCommand
   }
 
 export
+literateCmd : Command "literate"
+literateCmd = MkCommand
+  { description = "Literate LaTeX backend"
+  , subcommands =
+    [ "init"     ::= initLatexCmd
+    ]
+  , modifiers   = ["--config" ::= option """
+                    Preamble configuration file in Dhall format.
+                    Use `init` to generate the defaults config file.
+                    """ filePath
+                  -- TODO: support for snippets
+                  -- , "--snippet" ::= flag """
+                  --   Generates a standalone LaTeX file when unset or just \
+                  --   a code snippet when set.
+                  --   Default: unset/false.
+                  --   """
+                  ]
+  , arguments = lotsOf filePath
+  }
+
+export
 htmlCmd : Command "html"
 htmlCmd = MkCommand
   { description = "HTML backend"
@@ -112,6 +133,7 @@ katlaCmd = MkCommand
     , "latex"    ::= latexCmd
     , "html"     ::= htmlCmd
     , "markdown" ::= markdownCmd
+    , "literate" ::= literateCmd
     ]
   , modifiers = []
   , arguments = none
@@ -206,8 +228,25 @@ katlaMarkdownExec =
                Nothing -- (rawSnippet $ parsed.modifiers.project "--snippet")
                (parsed.modifiers.project "--config")
                (Just src) (Just md) Nothing
-       _ => failWithUsage htmlCmd
+       _ => failWithUsage markdownCmd
   , "init"     ::= [HTML.init]
+  ]
+
+katlaLiterateExec : CLI.literateCmd ~~> IO ()
+katlaLiterateExec =
+  [ \parsed => case parsed.arguments of
+       Just [src, md, output] => do
+         katla Literate
+               Nothing -- (rawSnippet $ parsed.modifiers.project "--snippet")
+               (parsed.modifiers.project "--config")
+               (Just src) (Just md) (Just output)
+       Just [src, md] => do
+         katla Literate
+               Nothing -- (rawSnippet $ parsed.modifiers.project "--snippet")
+               (parsed.modifiers.project "--config")
+               (Just src) (Just md) Nothing
+       _ => failWithUsage literateCmd
+  , "init"     ::= [LaTeX.init]
   ]
 
 katlaHTMLExec : CLI.htmlCmd ~~> IO ()
@@ -235,4 +274,5 @@ katlaExec =
   , "latex"    ::= katlaLatexExec
   , "html"     ::= katlaHTMLExec
   , "markdown" ::= katlaMarkdownExec
+  , "literate" ::= katlaLiterateExec
   ]

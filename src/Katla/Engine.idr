@@ -20,6 +20,7 @@ import Katla.Config
 import Katla.HTML
 import Katla.LaTeX
 import Katla.Markdown
+import Katla.Literate
 
 
 {- Relies on the fact that PosMap is an efficient mapping from position:
@@ -148,7 +149,7 @@ engineLitWithDecor output lineNumberWidth meta driver (t :: ts) = do
         -- a code block is opened by a keyword + untilEOL
         -- so the start of the code block is the beginning of the next line
         -- TODO: look at `l` to see if there are any options
-        ignore $ fPutStr output (pre "")
+        ignore $ fPutStrLn output (pre "")
         let pos = bimap (1+) (const 0) (start t)
         ignore $ processLines output meta driver Nothing pos content
         ignore $ fPutStr output post
@@ -241,19 +242,31 @@ engineWithRange input output lineNumberWidth meta driver rowRange currentDecor c
 
 export
 engine : Backend
+       -> Config
        -> (input, output : File)
        -> (lineNumberWidth : Nat)
        -> (meta : PosMap ASemanticDecoration)
        -> Driver
        -> Position
        -> IO ()
-engine Markdown input output lnw meta driver pos
+engine Markdown cfg input output lnw meta driver pos
   = do Right content <- fRead input
-         | Left err => pure ()
+         | Left err => do putStrLn "Error: \{show err}"
+                          exitFailure
        let Right ts = lexLiterate styleCMark content
-         | Left err => pure ()
+         | Left err => do putStrLn "Error: \{show err}"
+                          exitFailure
        engineLitWithDecor output lnw meta driver ts
-engine _ input output lnw meta driver pos
+engine Literate cfg input output lnw meta driver pos
+  = do Right content <- fRead input
+         | Left err => do putStrLn "Error: \{show err}"
+                          exitFailure
+       let Right ts = lexLiterate styleTeX content
+         | Left err => do putStrLn "Error: \{show err}"
+                          exitFailure
+       initSty cfg
+       engineLitWithDecor output lnw meta driver ts
+engine _ _ input output lnw meta driver pos
   = engineWithDecor input output lnw meta driver Nothing pos
 
 record FileHandles where
@@ -307,6 +320,7 @@ mkDriver : Backend -> (Config -> Driver)
 mkDriver HTML = HTML.mkDriver
 mkDriver LaTeX = LaTeX.mkDriver
 mkDriver Markdown = Markdown.mkDriver
+mkDriver Literate = Literate.mkDriver
 
 export
 katla : (backend : Backend) ->
@@ -337,7 +351,7 @@ katla backend Nothing mconfig (Just filename) (Just metadata) moutput = do
   Right content <- readFile filename
      | Left _  => pure ()
   let lnw = length $ show $ length $ lines content
-  engine backend files.source files.output lnw files.metadata driver (0,0)
+  engine backend files.config files.source files.output lnw files.metadata driver (0,0)
   Right _ <- fPutStrLn files.output standalonePost
     | Left err => error "generating preamble: \{show err}"
   closeFile files.output
@@ -364,7 +378,7 @@ katla backend (Just snippet) mconfig (Just filename) (Just metadata) moutput = d
       do Right content <- readFile filename
            | Left _  => pure ()
          let lnw = length $ show $ length $ lines content
-         engine backend files.source files.output lnw files.metadata driver (0,0)
+         engine backend files.config files.source files.output lnw files.metadata driver (0,0)
     Just range =>
       do let lnw = length $ show range.endRow
          engineWithRange files.source files.output lnw files.metadata driver range Nothing (0,0)

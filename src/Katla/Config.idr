@@ -148,7 +148,7 @@ defaultLatexConfig = MkConfig
     }
   , comment = MkCategory
     { style  = #"\itshape"#
-    , colour = "grey"
+    , colour = "Ivory3"
     }
   , hole = MkCategory
     { style  = #"\bfseries"#
@@ -171,13 +171,14 @@ defaultLatexConfig = MkConfig
 %runElab (deriveFromDhall Record `{ Config })
 
 public export
-data Backend = LaTeX | HTML | Markdown
+data Backend = LaTeX | HTML | Markdown | Literate
 
 export
 defaultConfig : Backend -> Config
 defaultConfig LaTeX = defaultLatexConfig
 defaultConfig HTML = defaultHTMLConfig
 defaultConfig Markdown = defaultHTMLConfig
+defaultConfig Literate = defaultLatexConfig
 
 export
 getConfiguration : Backend -> (configFile : Maybe String) -> IO Config

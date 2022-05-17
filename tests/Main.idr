@@ -13,6 +13,7 @@ tests = MkTestPool "Examples using Katla" [] Nothing
   , "macros"
   , "init"
   , "markdown"
+  , "literate"
   ]
 
 main : IO ()

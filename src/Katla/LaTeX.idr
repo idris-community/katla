@@ -9,6 +9,7 @@ import Katla.Config
 
 export
 escapeLatex : Char -> List Char
+escapeLatex '%' = fastUnpack "\\%"
 escapeLatex '\\' = fastUnpack "\\textbackslash{}"
 escapeLatex '{'  = fastUnpack "\\{"
 escapeLatex '}'  = fastUnpack "\\}"

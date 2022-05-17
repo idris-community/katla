@@ -20,6 +20,7 @@ modules
   , Katla.Engine
   , Katla.HTML
   , Katla.LaTeX
+  , Katla.Literate
   , Katla.Markdown
 
 

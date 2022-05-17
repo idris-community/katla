@@ -1,4 +1,4 @@
-||| Functions for generating
+||| HTML rendering of fenced idris codeblocks in markdown files
 module Katla.Markdown
 
 import Core.Metadata
