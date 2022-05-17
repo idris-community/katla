@@ -20,6 +20,7 @@ modules
   , Katla.Engine
   , Katla.HTML
   , Katla.LaTeX
+  , Katla.Markdown
 
 
 -- main file (i.e. file to load at REPL)

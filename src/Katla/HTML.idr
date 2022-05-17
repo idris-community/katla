@@ -2,6 +2,7 @@
 module Katla.HTML
 
 import Core.Metadata
+import Data.String
 import System.File
 
 import Collie
@@ -14,69 +15,50 @@ escapeHTML : Config -> Char -> List Char
 escapeHTML config ' ' = unpack config.space
 escapeHTML config c = unpack (htmlEscape $ cast c)
 
+convert : Decoration -> String
+convert Typ        = "IdrisType"
+convert Function   = "IdrisFunction"
+convert Data       = "IdrisData"
+convert Keyword    = "IdrisKeyword"
+convert Bound      = "IdrisBound"
+convert Namespace  = "IdrisNamespace"
+convert Postulate  = "IdrisPostulate"
+convert Module     = "IdrisModule"
+convert Comment    = "IdrisComment"
+
 export
 annotate : Maybe Decoration -> String -> String
 annotate Nothing    s = s
 annotate (Just dec) s = apply (convert dec) s
   where
-    convert : Decoration -> String
-    convert Typ        = "IdrisType"
-    convert Function   = "IdrisFunction"
-    convert Data       = "IdrisData"
-    convert Keyword    = "IdrisKeyword"
-    convert Bound      = "IdrisBound"
-    convert Namespace  = "IdrisNamespace"
-    convert Postulate  = "IdrisPostulate"
-    convert Module     = "IdrisModule"
-    convert Comment    = "IdrisComment"
 
     apply : String -> String -> String
     apply f a = #"<span class="\#{f}">\#{a}</span>"#
 
+-- /!\ Do not introduce additional empty lines as that would probably
+--     break the markdown backend!
+export
+styleElement : Decoration -> Category -> String
+styleElement dec cat = concat $ intersperse "\n" $ catMaybes
+  [ pure ("." ++ convert dec ++ " {")
+  , ("  \{cat .style}") <$ guard (cat .style /= "")
+  , ("  color: \{cat .colour}") <$ guard (cat .colour /= "")
+  , pure "}"
+  ]
+
 export
 styleHeader : Config -> String
 styleHeader cfg =  """
-    .IdrisData {
-      \{cfg.datacons .style}
-      color: \{cfg.datacons .colour}
-    }
-    .IdrisType {
-      \{cfg.typecons .style}
-      color: \{cfg.typecons .colour}
-    }
-    .IdrisBound {
-      \{cfg.bound .style}
-      color: \{cfg.bound .colour}
-    }
-    .IdrisFunction {
-      \{cfg.function .style}
-      color: \{cfg.function .colour}
-    }
-    .IdrisKeyword {
-      \{cfg.keyword .style}
-      color: \{cfg.keyword .colour}
-    }
-    .IdrisImplicit {
-      \{cfg.bound .style}
-      color: \{cfg.bound .colour}
-    }
-    .IdrisComment {
-      \{cfg.comment .style}
-      color: \{cfg.comment .colour}
-    }
-    .IdrisNamespace {
-      \{cfg.namespce .style}
-      color: \{cfg.namespce .colour}
-    }
-    .IdrisPostulate {
-      \{cfg.postulte .style}
-      color: \{cfg.postulte .colour}
-    }
-    .IdrisModule {
-      \{cfg.aModule .style}
-      color: \{cfg.aModule .colour}
-    }
-"""
+    \{styleElement Data cfg.datacons}
+    \{styleElement Typ cfg.typecons}
+    \{styleElement Bound cfg.bound}
+    \{styleElement Function cfg.function}
+    \{styleElement Keyword cfg.keyword}
+    \{styleElement Comment cfg.comment}
+    \{styleElement Namespace cfg.namespce}
+    \{styleElement Postulate cfg.postulte}
+    \{styleElement Module cfg.aModule}
+    """
 
 export
 standalonePre : Config -> String
@@ -171,7 +153,7 @@ standalonePre config = """
     </script>
   </head>
   <body onload="initialize()">
-  <code>
+  <code class="IdrisCode">
   """
 
 export
@@ -185,7 +167,7 @@ standalonePost = """
 export
 makeMacroPre : String -> String
 makeMacroPre name = """
-  <code>
+  <code class="IdrisCode">
   """
 
 export
@@ -197,7 +179,7 @@ makeMacroPost = """
 export
 makeInlineMacroPre : String -> String
 makeInlineMacroPre name = """
-  <code>
+  <code class="IdrisCode">
   """
 
 export
@@ -212,7 +194,7 @@ mkDriver config = MkDriver
   (\ wdth, ln =>
     let ln = show ln
         lineID = "line\{ln}"
-        desc = concat (replicate (minus wdth (length ln)) "&nbsp;" ++ [ln]) in
+        desc = concat (List.replicate (minus wdth (length ln)) "&nbsp;" ++ [ln]) in
     ##"<div id="\##{lineID}"><a href="#\##{lineID}" class="IdrisLineNumber"> \##{desc} | </a>"##
   , "</div>")
   (escapeHTML config)
@@ -236,12 +218,12 @@ initExec : (moutput : Maybe String) -> IO ()
 initExec moutput = do
   Right file <- maybe (pure $ Right stdout) (flip openFile WriteTruncate) moutput
   | Left err => putStrLn """
-              Error while opening configuration file \{maybe "stdout" id moutput}:
+              Error while opening configuration file \{fromMaybe "stdout" moutput}:
               \{show err}
               """
   Right () <- fPutStrLn file $ defaultHTMLConfig.toString
   | Left err => putStrLn """
-      Error while writing preamble file \{maybe "stdout" id moutput}:
+      Error while writing preamble file \{fromMaybe "stdout" moutput}:
       \{show err}
       """
   closeFile file

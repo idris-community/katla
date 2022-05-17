@@ -159,12 +159,13 @@ defaultLatexConfig = MkConfig
 %runElab (deriveFromDhall Record `{ Config })
 
 public export
-data Backend = LaTeX | HTML
+data Backend = LaTeX | HTML | Markdown
 
 export
 defaultConfig : Backend -> Config
 defaultConfig LaTeX = defaultLatexConfig
-defaultConfig HTML  = defaultHTMLConfig
+defaultConfig HTML = defaultHTMLConfig
+defaultConfig Markdown = defaultHTMLConfig
 
 export
 getConfiguration : Backend -> (configFile : Maybe String) -> IO Config

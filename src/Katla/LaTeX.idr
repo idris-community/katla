@@ -184,7 +184,7 @@ preambleExec moutput configFile = do
   config <- getConfiguration LaTeX configFile
   Right () <- fPutStr file $ laTeXHeader config
   | Left err => putStrLn """
-      Error while writing preamble file \{maybe "stdout" id moutput}:
+      Error while writing preamble file \{fromMaybe "stdout" moutput}:
       \{show err}
       """
   closeFile file
@@ -198,12 +198,12 @@ initExec : (moutput : Maybe String) -> IO ()
 initExec moutput = do
   Right file <- maybe (pure $ Right stdout) (flip openFile WriteTruncate) moutput
   | Left err => putStrLn """
-              Error while opening configuration file \{maybe "stdout" id moutput}:
+              Error while opening configuration file \{fromMaybe "stdout" moutput}:
               \{show err}
               """
   Right () <- fPutStrLn file $ defaultLatexConfig.toString
   | Left err => putStrLn """
-      Error while writing preamble file \{maybe "stdout" id moutput}:
+      Error while writing preamble file \{fromMaybe "stdout" moutput}:
       \{show err}
       """
   closeFile file
