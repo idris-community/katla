@@ -15,17 +15,6 @@ escapeHTML : Config -> Char -> List Char
 escapeHTML config ' ' = unpack config.space
 escapeHTML config c = unpack (htmlEscape $ cast c)
 
-convert : Decoration -> String
-convert Typ        = "IdrisType"
-convert Function   = "IdrisFunction"
-convert Data       = "IdrisData"
-convert Keyword    = "IdrisKeyword"
-convert Bound      = "IdrisBound"
-convert Namespace  = "IdrisNamespace"
-convert Postulate  = "IdrisPostulate"
-convert Module     = "IdrisModule"
-convert Comment    = "IdrisComment"
-
 export
 annotate : Maybe Decoration -> String -> String
 annotate Nothing    s = s
@@ -212,22 +201,6 @@ initHTMLCmd = MkCommand
   , arguments = filePath
   }
 
-
-export
-initExec : (moutput : Maybe String) -> IO ()
-initExec moutput = do
-  Right file <- maybe (pure $ Right stdout) (flip openFile WriteTruncate) moutput
-  | Left err => putStrLn """
-              Error while opening configuration file \{fromMaybe "stdout" moutput}:
-              \{show err}
-              """
-  Right () <- fPutStrLn file $ defaultHTMLConfig.toString
-  | Left err => putStrLn """
-      Error while writing preamble file \{fromMaybe "stdout" moutput}:
-      \{show err}
-      """
-  closeFile file
-
 export
 init : (ParsedCommand _ HTML.initHTMLCmd) -> IO ()
-init parsed = initExec parsed.arguments
+init parsed = initExec HTML parsed.arguments

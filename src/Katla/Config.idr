@@ -10,6 +10,18 @@ import Core.Metadata
 
 %language ElabReflection
 
+export
+convert : Decoration -> String
+convert Typ        = "IdrisType"
+convert Function   = "IdrisFunction"
+convert Data       = "IdrisData"
+convert Keyword    = "IdrisKeyword"
+convert Bound      = "IdrisBound"
+convert Namespace  = "IdrisNamespace"
+convert Postulate  = "IdrisPostulate"
+convert Module     = "IdrisModule"
+convert Comment    = "IdrisComment"
+
 public export
 record Category where
   constructor MkCategory
@@ -191,3 +203,20 @@ record Driver where
   standalone  : (String, String)
   inlineMacro : (String -> String, String)
   blockMacro  : (String -> String, String)
+
+export
+initExec : (backend : Backend) -> (moutput : Maybe String) -> IO ()
+initExec backend moutput = do
+  Right file <- maybe (pure $ Right stdout) (flip openFile WriteTruncate) moutput
+  | Left err => do putStrLn """
+                            Error while opening configuration file \{fromMaybe "stdout" moutput}:
+                            \{show err}
+                            """
+                   exitFailure
+  Right () <- fPutStrLn file $ (defaultConfig backend).toString
+  | Left err => do putStrLn """
+                            Error while writing preamble file \{fromMaybe "stdout" moutput}:
+                            \{show err}
+                            """
+                   exitFailure
+  closeFile file
