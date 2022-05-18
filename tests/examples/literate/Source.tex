@@ -1,0 +1,24 @@
+\documentclass{article}
+
+\usepackage{idris2}
+
+\begin{document}
+
+\section{My cool paper}
+
+This code is embedded in a literate file.
+
+\begin{code}
+module Source
+
+%default total
+
+||| My first Idris2 function in tex
+main : IO ()
+main = putStrLn "Hello from inside TeX"
+\end{code}
+
+We're hoping the output pdf will have the \textbf{code blocks} highlighted
+while the rest is typeset by \LaTeX{}.
+
+\end{document}

@@ -9,6 +9,7 @@ import Katla.Config
 
 export
 escapeLatex : Char -> List Char
+escapeLatex '%' = fastUnpack "\\%"
 escapeLatex '\\' = fastUnpack "\\textbackslash{}"
 escapeLatex '{'  = fastUnpack "\\{"
 escapeLatex '}'  = fastUnpack "\\}"
@@ -20,16 +21,6 @@ annotate : Maybe Decoration -> String -> String
 annotate Nothing    s = s
 annotate (Just dec) s = apply (convert dec) s
   where
-    convert : Decoration -> String
-    convert Typ       = "IdrisType"
-    convert Function  = "IdrisFunction"
-    convert Data      = "IdrisData"
-    convert Keyword   = "IdrisKeyword"
-    convert Bound     = "IdrisBound"
-    convert Namespace = "IdrisNamespace"
-    convert Postulate = "IdrisPostulate"
-    convert Module    = "IdrisModule"
-    convert Comment   = "IdrisComment"
 
     apply : String -> String -> String
     apply f a = "\\\{f}{\{a}}"
@@ -173,7 +164,6 @@ initLatexCmd = MkCommand
   }
 
 
-
 preambleExec : (moutput : Maybe String) -> (configFile : Maybe String) -> IO ()
 preambleExec moutput configFile = do
   Right file <- maybe (pure $ Right stdout) (flip openFile WriteTruncate) moutput
@@ -194,20 +184,5 @@ preamble : (ParsedCommand _ LaTeX.preambleCmd) -> IO ()
 preamble parsed = preambleExec parsed.arguments (parsed.modifiers.project "--config")
 
 export
-initExec : (moutput : Maybe String) -> IO ()
-initExec moutput = do
-  Right file <- maybe (pure $ Right stdout) (flip openFile WriteTruncate) moutput
-  | Left err => putStrLn """
-              Error while opening configuration file \{fromMaybe "stdout" moutput}:
-              \{show err}
-              """
-  Right () <- fPutStrLn file $ defaultLatexConfig.toString
-  | Left err => putStrLn """
-      Error while writing preamble file \{fromMaybe "stdout" moutput}:
-      \{show err}
-      """
-  closeFile file
-
-export
 init : (ParsedCommand _ LaTeX.initLatexCmd) -> IO ()
-init parsed = initExec parsed.arguments
+init parsed = initExec LaTeX parsed.arguments

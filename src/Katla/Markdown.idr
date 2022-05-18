@@ -1,4 +1,4 @@
-||| Functions for generating
+||| HTML rendering of fenced idris codeblocks in markdown files
 module Katla.Markdown
 
 import Core.Metadata
@@ -49,22 +49,5 @@ initMarkdownCmd = MkCommand
   }
 
 export
-initExec : (moutput : Maybe String) -> IO ()
-initExec moutput = do
-  Right file <- maybe (pure $ Right stdout) (flip openFile WriteTruncate) moutput
-  | Left err => do putStrLn """
-                            Error while opening configuration file \{fromMaybe "stdout" moutput}:
-                            \{show err}
-                            """
-                   exitFailure
-  Right () <- fPutStrLn file $ defaultHTMLConfig.toString
-  | Left err => do putStrLn """
-                            Error while writing preamble file \{fromMaybe "stdout" moutput}:
-                            \{show err}
-                            """
-                   exitFailure
-  closeFile file
-
-export
 init : (ParsedCommand _ Markdown.initMarkdownCmd) -> IO ()
-init parsed = Markdown.initExec parsed.arguments
+init parsed = initExec Markdown parsed.arguments

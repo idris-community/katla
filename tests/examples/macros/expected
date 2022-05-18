@@ -22,7 +22,7 @@
 \newcommand{\IdrisHlightColourFunction}{Chartreuse4}
 \newcommand{\IdrisHlightColourKeyword} {black}
 \newcommand{\IdrisHlightColourImplicit}{DarkOrchid3}
-\newcommand{\IdrisHlightColourComment} {grey}
+\newcommand{\IdrisHlightColourComment} {Ivory3}
 \newcommand{\IdrisHlightColourHole}    {yellow}
 \newcommand{\IdrisHlightColourNamespace}{black}
 \newcommand{\IdrisHlightColourPostulate}{DarkOrchid3}
