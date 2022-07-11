@@ -19,19 +19,19 @@ initStyFile = do
 export
 makeMacroPre : String -> String
 makeMacroPre name = """
-  \\begin{Verbatim}[commandchars=\\\\\\{\\}]
+  \\begin{code}
   """
 
 export
 makeMacroPost : String
 makeMacroPost = """
-  \\end{Verbatim}
+  \\end{code}
   """
 
 export
 mkDriver : Config -> Driver
 mkDriver config = MkDriver
-  (\ wdth, ln => "", "")
+  (\ wdth, ln => "", "\\KatlaNewline{}")
   (escapeLatex)
   annotate
   ("", "")
