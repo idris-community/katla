@@ -14,7 +14,7 @@ escapeLatex '\\' = fastUnpack "\\textbackslash{}"
 escapeLatex '{'  = fastUnpack "\\{"
 escapeLatex '}'  = fastUnpack "\\}"
 escapeLatex ' '  = fastUnpack "\\KatlaSpace{}"
-escapeLatex '_'  = fastUnpack "\\_"
+escapeLatex '_'  = fastUnpack "\\KatlaUnderscore{}"
 escapeLatex x    = [x]
 
 export
@@ -34,6 +34,7 @@ laTeXHeader cfg =  """
 \\newcommand{\\Katla}                [2][]{\\VerbatimInput[commandchars=\\\\\\{\\}#1]{#2}}
 \\newcommand{\\KatlaNewline}            {}
 \\newcommand{\\KatlaSpace}              {\{cfg.space}}
+\\newcommand{\\KatlaUnderscore}         {\\string_}
 \\newcommand{\\IdrisHlightFont}         {\{cfg.font}}
 \\newcommand{\\IdrisHlightStyleData}    {\{cfg.datacons .style}}
 \\newcommand{\\IdrisHlightStyleType}    {\{cfg.typecons .style}}
