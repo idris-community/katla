@@ -13,6 +13,7 @@ escapeLatex '%' = fastUnpack "\\%"
 escapeLatex '\\' = fastUnpack "\\textbackslash{}"
 escapeLatex '{'  = fastUnpack "\\{"
 escapeLatex '}'  = fastUnpack "\\}"
+escapeLatex '$'  = fastUnpack "\\$"
 escapeLatex ' '  = fastUnpack "\\KatlaSpace{}"
 escapeLatex '_'  = fastUnpack "\\KatlaUnderscore{}"
 escapeLatex x    = [x]
