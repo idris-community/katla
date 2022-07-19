@@ -13,7 +13,9 @@ escapeLatex '%' = fastUnpack "\\%"
 escapeLatex '\\' = fastUnpack "\\textbackslash{}"
 escapeLatex '{'  = fastUnpack "\\{"
 escapeLatex '}'  = fastUnpack "\\}"
+escapeLatex '$'  = fastUnpack "\\$"
 escapeLatex ' '  = fastUnpack "\\KatlaSpace{}"
+escapeLatex '_'  = fastUnpack "\\KatlaUnderscore{}"
 escapeLatex x    = [x]
 
 export
@@ -31,7 +33,9 @@ laTeXHeader cfg =  """
 \\usepackage{fancyvrb}
 \\usepackage[x11names]{xcolor}
 \\newcommand{\\Katla}                [2][]{\\VerbatimInput[commandchars=\\\\\\{\\}#1]{#2}}
+\\newcommand{\\KatlaNewline}            {}
 \\newcommand{\\KatlaSpace}              {\{cfg.space}}
+\\newcommand{\\KatlaUnderscore}         {\\string_}
 \\newcommand{\\IdrisHlightFont}         {\{cfg.font}}
 \\newcommand{\\IdrisHlightStyleData}    {\{cfg.datacons .style}}
 \\newcommand{\\IdrisHlightStyleType}    {\{cfg.typecons .style}}
@@ -74,6 +78,10 @@ laTeXHeader cfg =  """
 \\newcommand{\\IdrisNamespace}[1]{\\RawIdrisHighlight{\\IdrisHlightColourNamespace}{\\IdrisHlightStyleNamespace}{#1}}
 \\newcommand{\\IdrisPostulate}[1]{\\RawIdrisHighlight{\\IdrisHlightColourPostulate}{\\IdrisHlightStylePostulate}{#1}}
 \\newcommand{\\IdrisModule}[1]{\\RawIdrisHighlight{\\IdrisHlightColourModule}{\\IdrisHlightStyleModule}{#1}}
+
+\\newenvironment{code}
+  {\\begin{Verbatim}[commandchars=\\\\\\{\\}]}
+  {\\end{Verbartim}}
 
 % Bugfix in fancyvrb to allow inline saved listings
 \\makeatletter
@@ -132,7 +140,7 @@ makeInlineMacroPost = """
 export
 mkDriver : Config -> Driver
 mkDriver config = MkDriver
-  (\_, _ => "", "")
+  (\_, _ => "", "\\KatlaNewline{}")
   escapeLatex
   annotate
   (standalonePre config, standalonePost)
