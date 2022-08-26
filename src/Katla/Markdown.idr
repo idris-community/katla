@@ -15,6 +15,7 @@ escapeMarkdown : Config -> Char -> List Char
 escapeMarkdown config ' ' = unpack config.space
 escapeMarkdown config '_' = unpack "\\_"
 escapeMarkdown config '*' = unpack "\\*"
+escapeMarkdown config '$' = unpack "\\$"
 escapeMarkdown config c = unpack (htmlEscape $ cast c)
 
 export
