@@ -87,7 +87,7 @@
 \IdrisFunction{m}\KatlaSpace{}\IdrisKeyword{=}\KatlaSpace{}\IdrisPostulate{believe_me}\KatlaSpace{}\IdrisData{\%MkWorld}
 
 \IdrisFunction{Rainbow}\KatlaSpace{}\IdrisKeyword{:}\KatlaSpace{}\IdrisType{Nat}\KatlaSpace{}\IdrisKeyword{->}\KatlaSpace{}\IdrisType{Type}
-\IdrisFunction{Rainbow}\KatlaSpace{}\IdrisBound{n}\KatlaSpace{}\IdrisKeyword{=}\KatlaSpace{}\KatlaSpace{}\IdrisType{[}\KatlaSpace{}\IdrisBound{n}\KatlaSpace{}\IdrisData{,}\KatlaSpace{}\IdrisFunction{m}\KatlaSpace{}\IdrisType{,}\KatlaSpace{}\IdrisBound{n}\KatlaSpace{}\IdrisData{]}
+\IdrisFunction{Rainbow}\KatlaSpace{}\IdrisBound{n}\KatlaSpace{}\IdrisKeyword{=}\KatlaSpace{}\IdrisKeyword{(\textbackslash{}}\IdrisBound{x}\KatlaSpace{}\IdrisKeyword{=>}\KatlaSpace{}\IdrisBound{x}\IdrisKeyword{)}\KatlaSpace{}$\KatlaSpace{}\IdrisType{[}\KatlaSpace{}\IdrisBound{n}\KatlaSpace{}\IdrisData{,}\KatlaSpace{}\IdrisFunction{m}\KatlaSpace{}\IdrisType{,}\KatlaSpace{}\IdrisBound{n}\KatlaSpace{}\IdrisData{]}
 
 \end{Verbatim}
 \end{document}
