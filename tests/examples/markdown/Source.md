@@ -41,6 +41,7 @@ And here is a successful definition (which demonstrates that we have indeed impo
 ```idris
 main : IO ()
 main = putStrLn
+     $ (\x => x)
      $ unwords
      [ "Hello,"
      , "from"
