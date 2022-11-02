@@ -336,7 +336,7 @@ katla _ _       _       _       Nothing _
 -- Generate a fully formed file
 katla backend Nothing mconfig (Just filename) (Just metadata) moutput = do
   Right files <- setupFiles backend mconfig filename metadata moutput
-    | Left ReportedError => pure ()
+    | Left ReportedError => exitFailure
 
   let error : String -> IO ()
       error str = do putStrLn "Error while \{str}"
@@ -349,7 +349,7 @@ katla backend Nothing mconfig (Just filename) (Just metadata) moutput = do
   Right _ <- fPutStrLn files.output standalonePre
     | Left err => error "generating preamble: \{show err}"
   Right content <- readFile filename
-     | Left _  => pure ()
+     | Left err  => error "opening file: \{show err}"
   let lnw = length $ show $ length $ lines content
   engine backend files.config files.source files.output lnw files.metadata driver (0,0)
   Right _ <- fPutStrLn files.output standalonePost
@@ -376,7 +376,7 @@ katla backend (Just snippet) mconfig (Just filename) (Just metadata) moutput = d
   case snippet.listing of
     Nothing    =>
       do Right content <- readFile filename
-           | Left _  => pure ()
+           | Left err  => error "opening file: \{show err}"
          let lnw = length $ show $ length $ lines content
          engine backend files.config files.source files.output lnw files.metadata driver (0,0)
     Just range =>
