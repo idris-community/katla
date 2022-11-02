@@ -9,6 +9,7 @@ import Katla.Config
 
 export
 escapeLatex : Char -> List Char
+escapeLatex '&' = fastUnpack "\\&"
 escapeLatex '%' = fastUnpack "\\%"
 escapeLatex '\\' = fastUnpack "\\textbackslash{}"
 escapeLatex '{'  = fastUnpack "\\{"
@@ -16,6 +17,7 @@ escapeLatex '}'  = fastUnpack "\\}"
 escapeLatex '$'  = fastUnpack "\\$"
 escapeLatex ' '  = fastUnpack "\\KatlaSpace{}"
 escapeLatex '_'  = fastUnpack "\\KatlaUnderscore{}"
+escapeLatex '~'  = fastUnpack "\\KatlaTilde{}"
 escapeLatex x    = [x]
 
 export
@@ -36,6 +38,7 @@ laTeXHeader cfg =  """
 \\newcommand{\\KatlaNewline}            {}
 \\newcommand{\\KatlaSpace}              {\{cfg.space}}
 \\newcommand{\\KatlaUnderscore}         {\\string_}
+\\newcommand{\\KatlaUnderscore}         {\\string~}
 \\newcommand{\\IdrisHlightFont}         {\{cfg.font}}
 \\newcommand{\\IdrisHlightStyleData}    {\{cfg.datacons .style}}
 \\newcommand{\\IdrisHlightStyleType}    {\{cfg.typecons .style}}
