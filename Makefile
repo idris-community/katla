@@ -1,8 +1,8 @@
-project:build/exec/katla
+.PHONY: project install test doc clean
 
-.PHONY:
+project: build/exec/katla
 
-build/exec/katla: .PHONY
+build/exec/katla:
 	idris2 --build katla.ipkg
 
 install: build/exec/katla
