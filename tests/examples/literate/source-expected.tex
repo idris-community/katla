@@ -9,15 +9,15 @@
 
 This code is embedded in a literate file.
 
-\begin{Verbatim}[commandchars=\\\{\}]
-\IdrisKeyword{module}\KatlaSpace{}\IdrisModule{Source}
-
-\IdrisKeyword{\%default}\KatlaSpace{}\IdrisKeyword{total}
-
-\IdrisComment{|||\KatlaSpace{}My\KatlaSpace{}first\KatlaSpace{}Idris2\KatlaSpace{}function\KatlaSpace{}in\KatlaSpace{}tex}
-\IdrisFunction{main}\KatlaSpace{}\IdrisKeyword{:}\KatlaSpace{}\IdrisType{IO}\KatlaSpace{}\IdrisType{()}
-\IdrisFunction{main}\KatlaSpace{}\IdrisKeyword{=}\KatlaSpace{}\IdrisFunction{putStrLn}\KatlaSpace{}\IdrisData{"Hello\KatlaSpace{}from\KatlaSpace{}inside\KatlaSpace{}TeX"}
-\end{Verbatim}
+\begin{code}
+\IdrisKeyword{module}\KatlaSpace{}\IdrisModule{Source}\KatlaNewline{}
+\KatlaNewline{}
+\IdrisKeyword{\%default}\KatlaSpace{}\IdrisKeyword{total}\KatlaNewline{}
+\KatlaNewline{}
+\IdrisComment{|||\KatlaSpace{}My\KatlaSpace{}first\KatlaSpace{}Idris2\KatlaSpace{}function\KatlaSpace{}in\KatlaSpace{}tex}\KatlaNewline{}
+\IdrisFunction{main}\KatlaSpace{}\IdrisKeyword{:}\KatlaSpace{}\IdrisType{IO}\KatlaSpace{}\IdrisType{()}\KatlaNewline{}
+\IdrisFunction{main}\KatlaSpace{}\IdrisKeyword{=}\KatlaSpace{}\IdrisFunction{putStrLn}\KatlaSpace{}\IdrisData{"Hello\KatlaSpace{}from\KatlaSpace{}inside\KatlaSpace{}TeX"}\KatlaNewline{}
+\end{code}
 
 We're hoping the output pdf will have the \textbf{code blocks} highlighted
 while the rest is typeset by \LaTeX{}.
