@@ -94,7 +94,7 @@
 \IdrisFunction{m}\KatlaSpace{}\IdrisKeyword{=}\KatlaSpace{}\IdrisPostulate{believe\KatlaUnderscore{}me}\KatlaSpace{}\IdrisData{\%MkWorld}\KatlaNewline{}
 \KatlaNewline{}
 \IdrisFunction{Rainbow}\KatlaSpace{}\IdrisKeyword{:}\KatlaSpace{}\IdrisType{Nat}\KatlaSpace{}\IdrisKeyword{->}\KatlaSpace{}\IdrisType{Type}\KatlaNewline{}
-\IdrisFunction{Rainbow}\KatlaSpace{}\IdrisBound{n}\KatlaSpace{}\IdrisKeyword{=}\KatlaSpace{}\KatlaSpace{}\IdrisType{[}\KatlaSpace{}\IdrisBound{n}\KatlaSpace{}\IdrisData{,}\KatlaSpace{}\IdrisFunction{m}\KatlaSpace{}\IdrisType{,}\KatlaSpace{}\IdrisBound{n}\KatlaSpace{}\IdrisData{]}\KatlaNewline{}
+\IdrisFunction{Rainbow}\KatlaSpace{}\IdrisBound{n}\KatlaSpace{}\IdrisKeyword{=}\KatlaSpace{}\IdrisKeyword{(\textbackslash{}}\IdrisBound{x}\KatlaSpace{}\IdrisKeyword{=>}\KatlaSpace{}\IdrisBound{x}\IdrisKeyword{)}\KatlaSpace{}\$\KatlaSpace{}\IdrisType{[}\KatlaSpace{}\IdrisBound{n}\KatlaSpace{}\IdrisData{,}\KatlaSpace{}\IdrisFunction{m}\KatlaSpace{}\IdrisType{,}\KatlaSpace{}\IdrisBound{n}\KatlaSpace{}\IdrisData{]}\KatlaNewline{}
 \KatlaNewline{}
 \end{Verbatim}
 \end{document}

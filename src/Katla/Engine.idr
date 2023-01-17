@@ -280,7 +280,7 @@ data Error a = ReportedError | Unreported a
 
 orDie : Core a -> (Error -> String) -> IO a
 orDie a k = coreRun a
-  (\ err => putStrLn (k err) >> exitFailure)
+  (\ err => ignore (fPutStrLn {io = IO} stderr (k err)) >> exitFailure)
   pure
 
 export
@@ -291,18 +291,30 @@ setupFiles : Backend ->
   IO FileHandles
 setupFiles backend mconfig filename metadata moutput = do
   config <- getConfiguration backend mconfig
-  Right source <- openFile filename  Read
-    | Left err => do putStrLn "Couldn't open source file: \{filename}."
-                     exitFailure
+  Right source <- openFile filename Read
+    | Left err =>
+       do ignore $ fPutStrLn stderr
+            """
+               Couldn't open source file: \{filename}.
+               \{show err}
+            """
+          exitFailure
   fmd <- readMetadata metadata `orDie` \ err =>
           """
              Couldn't open metadata file: \{metadata}
              \{show err}
           """
-  Right output <- maybe (pure $ Right stdout) (\output => openFile output WriteTruncate) moutput
-    | Left err => do putStrLn "couldn't open output: "
-                     putStrLn (show err)
-                     exitFailure
+  Right output <- maybe
+              (pure $ Right stdout)
+              (\output => openFile output WriteTruncate)
+              moutput
+    | Left err =>
+      do ignore $ fPutStrLn stderr
+           """
+              Couldn't open output: \{fromMaybe "" moutput}
+              \{show err}
+           """
+         exitFailure
   -- required because `allSemanticHighlighting` does some logging
   meta <- (do defs <- initDefs
               c <- newRef Ctxt defs
@@ -345,7 +357,7 @@ katla backend Nothing mconfig (Just filename) (Just metadata) moutput = do
   files <- setupFiles backend mconfig filename metadata moutput
 
   let error : String -> IO ()
-      error str = do putStrLn "Error while \{str}"
+      error str = do ignore $ fPutStrLn stderr "Error while \{str}"
                      closeFile files.output
                      exitFailure
 
@@ -355,7 +367,7 @@ katla backend Nothing mconfig (Just filename) (Just metadata) moutput = do
   Right _ <- fPutStrLn files.output standalonePre
     | Left err => error "generating preamble: \{show err}"
   Right content <- readFile filename
-     | Left _  => pure ()
+     | Left err  => error "opening file: \{show err}"
   let lnw = length $ show $ length $ lines content
   engine backend files.config files.source files.output lnw files.metadata driver (0,0)
   Right _ <- fPutStrLn files.output standalonePost
@@ -381,7 +393,7 @@ katla backend (Just snippet) mconfig (Just filename) (Just metadata) moutput = d
   case snippet.listing of
     Nothing    =>
       do Right content <- readFile filename
-           | Left _  => pure ()
+           | Left err  => error "opening file: \{show err}"
          let lnw = length $ show $ length $ lines content
          engine backend files.config files.source files.output lnw files.metadata driver (0,0)
     Just range =>

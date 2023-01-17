@@ -75,7 +75,8 @@ And here is a successful definition (which demonstrates that we have indeed impo
 <code class="IdrisCode">
 <span class="IdrisFunction">main</span>&nbsp;<span class="IdrisKeyword">:</span>&nbsp;<span class="IdrisType">IO</span>&nbsp;<span class="IdrisType">()</span><br />
 <span class="IdrisFunction">main</span>&nbsp;<span class="IdrisKeyword">=</span>&nbsp;<span class="IdrisFunction">putStrLn</span><br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$&nbsp;<span class="IdrisFunction">unwords</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#36;&nbsp;<span class="IdrisKeyword">(\\</span><span class="IdrisBound">x</span>&nbsp;<span class="IdrisKeyword">=&gt;</span>&nbsp;<span class="IdrisBound">x</span><span class="IdrisKeyword">)</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#36;&nbsp;<span class="IdrisFunction">unwords</span><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="IdrisData">[</span>&nbsp;<span class="IdrisData">&quot;Hello,&quot;</span><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="IdrisData">,</span>&nbsp;<span class="IdrisData">&quot;from&quot;</span><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="IdrisData">,</span>&nbsp;<span class="IdrisData">&quot;the&quot;</span><br />
