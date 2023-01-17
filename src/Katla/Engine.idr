@@ -5,6 +5,7 @@ import System.File
 import Core.FC
 import Core.Name
 import Core.Core
+import Core.Context
 import Core.Metadata
 import Libraries.Data.PosMap
 import Libraries.Text.Literate
@@ -277,34 +278,52 @@ record FileHandles where
 
 data Error a = ReportedError | Unreported a
 
-exit : IO (Either (Engine.Error a) b)
-exit = pure (Left ReportedError)
+orDie : Core a -> (Error -> String) -> IO a
+orDie a k = coreRun a
+  (\ err => ignore (fPutStrLn {io = IO} stderr (k err)) >> exitFailure)
+  pure
 
 export
 setupFiles : Backend ->
   (mconfig : Maybe String) ->
   (msourcefile, mmetadata : String) ->
   (moutput : Maybe String) ->
-  IO (Either (Error Void) FileHandles)
+  IO FileHandles
 setupFiles backend mconfig filename metadata moutput = do
   config <- getConfiguration backend mconfig
-  Right source <- openFile filename  Read
-  | Left err => do putStrLn "Couldn't open source file: \{filename}."
-                   exit
-  Just fmd <- coreRun (map Just (readMetadata metadata))
-                      (\err => do putStrLn $ show err
-                                  pure Nothing)
-                      pure
-  | Nothing => do putStrLn "Couldn't open metadata file: \{metadata}"
-                  exit
+  Right source <- openFile filename Read
+    | Left err =>
+       do ignore $ fPutStrLn stderr
+            """
+               Couldn't open source file: \{filename}.
+               \{show err}
+            """
+          exitFailure
+  fmd <- readMetadata metadata `orDie` \ err =>
+          """
+             Couldn't open metadata file: \{metadata}
+             \{show err}
+          """
+  Right output <- maybe
+              (pure $ Right stdout)
+              (\output => openFile output WriteTruncate)
+              moutput
+    | Left err =>
+      do ignore $ fPutStrLn stderr
+           """
+              Couldn't open output: \{fromMaybe "" moutput}
+              \{show err}
+           """
+         exitFailure
+  -- required because `allSemanticHighlighting` does some logging
+  meta <- (do defs <- initDefs
+              c <- newRef Ctxt defs
+              allSemanticHighlighting fmd)
+          `orDie` \ err => "Couldn't assemble metadata: \{show err}"
 
-  Right output <- maybe (pure $ Right stdout) (\output => openFile output WriteTruncate) moutput
-  | Left err => do putStrLn "couldn't open output: "
-                   exit
-
-  pure $ Right $ MkHandles
+  pure $ MkHandles
     { config, source, output
-    , metadata = fmd.semanticHighlighting
+    , metadata = meta
     }
 
 public export
@@ -335,11 +354,10 @@ katla _ _       _       _       Nothing _
   = putStrLn "Expecting metadata file to output."
 -- Generate a fully formed file
 katla backend Nothing mconfig (Just filename) (Just metadata) moutput = do
-  Right files <- setupFiles backend mconfig filename metadata moutput
-    | Left ReportedError => exitFailure
+  files <- setupFiles backend mconfig filename metadata moutput
 
   let error : String -> IO ()
-      error str = do putStrLn "Error while \{str}"
+      error str = do ignore $ fPutStrLn stderr "Error while \{str}"
                      closeFile files.output
                      exitFailure
 
@@ -357,8 +375,7 @@ katla backend Nothing mconfig (Just filename) (Just metadata) moutput = do
   closeFile files.output
 -- Generate only the listing code
 katla backend (Just snippet) mconfig (Just filename) (Just metadata) moutput = do
-  Right files <- setupFiles backend mconfig filename metadata moutput
-    | Left ReportedError => exitFailure
+  files <- setupFiles backend mconfig filename metadata moutput
 
   let error : String -> IO ()
       error str = do putStrLn "Error while \{str}"
