@@ -4,12 +4,12 @@ idris2 -c Rainbow.idr
 mkdir temp
 
 # Test Katla HTML
-$1 html ./Rainbow.idr ./build/ttc/Rainbow.ttm > temp/rainbow.html
+$1 html ./Rainbow.idr ./build/ttc/*/Rainbow.ttm > temp/rainbow.html
 diff rainbow-expected.html temp/rainbow.html >> output
 
 # Test Katla LaTeX
-$1 latex ./Rainbow.idr ./build/ttc/Rainbow.ttm | tee temp/rainbow.tex
-$1 latex ./Rainbow.idr ./build/ttc/Rainbow.ttm temp/rainbow-direct.tex
+$1 latex ./Rainbow.idr ./build/ttc/*/Rainbow.ttm | tee temp/rainbow.tex
+$1 latex ./Rainbow.idr ./build/ttc/*/Rainbow.ttm temp/rainbow-direct.tex
 
 # Test generated pdfs
 sh ../../scripts/pdfgen temp rainbow

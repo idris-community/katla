@@ -38,7 +38,7 @@ laTeXHeader cfg =  """
 \\newcommand{\\KatlaNewline}            {}
 \\newcommand{\\KatlaSpace}              {\{cfg.space}}
 \\newcommand{\\KatlaUnderscore}         {\\string_}
-\\newcommand{\\KatlaUnderscore}         {\\string~}
+\\newcommand{\\KatlaTilde}              {\\string~}
 \\newcommand{\\IdrisHlightFont}         {\{cfg.font}}
 \\newcommand{\\IdrisHlightStyleData}    {\{cfg.datacons .style}}
 \\newcommand{\\IdrisHlightStyleType}    {\{cfg.typecons .style}}

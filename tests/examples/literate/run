@@ -2,6 +2,6 @@ rm -rf temp build idris2.sty
 idris2 -c Source.tex
 
 mkdir temp
-$1 literate Source.tex build/ttc/Source.ttm > temp/Source.tex
+$1 literate Source.tex build/ttc/*/Source.ttm > temp/Source.tex
 diff source-expected.tex temp/Source.tex >> output
 diff idris2-expected.sty idris2.sty >> output

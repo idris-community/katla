@@ -4,5 +4,5 @@ idris2 -c Source.md
 mkdir temp
 
 # Test Katla markdown
-$1 markdown ./Source.md ./build/ttc/Source.ttm > temp/Source.md
+$1 markdown ./Source.md ./build/ttc/*/Source.ttm > temp/Source.md
 diff source-expected.md temp/Source.md >> output
