@@ -9,6 +9,7 @@ import Katla.Config
 
 export
 escapeLatex : Char -> List Char
+escapeLatex '-' = fastUnpack "\\KatlaDash{}"
 escapeLatex '&' = fastUnpack "\\&"
 escapeLatex '%' = fastUnpack "\\%"
 escapeLatex '\\' = fastUnpack "\\textbackslash{}"
@@ -37,6 +38,7 @@ laTeXHeader cfg =  """
 \\newcommand{\\Katla}                [2][]{\\VerbatimInput[commandchars=\\\\\\{\\}#1]{#2}}
 \\newcommand{\\KatlaNewline}            {}
 \\newcommand{\\KatlaSpace}              {\{cfg.space}}
+\\newcommand{\\KatlaDash}               {\\string-}
 \\newcommand{\\KatlaUnderscore}         {\\string_}
 \\newcommand{\\KatlaTilde}              {\\string~}
 \\newcommand{\\IdrisHlightFont}         {\{cfg.font}}

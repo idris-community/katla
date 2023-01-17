@@ -26,6 +26,7 @@
 \newcommand{\Katla}                [2][]{\VerbatimInput[commandchars=\\\{\}#1]{#2}}
 \newcommand{\KatlaNewline}            {}
 \newcommand{\KatlaSpace}              { }
+\newcommand{\KatlaDash}               {\string-}
 \newcommand{\KatlaUnderscore}         {\string_}
 \newcommand{\KatlaTilde}              {\string~}
 \newcommand{\IdrisHlightFont}         {\ttfamily}
