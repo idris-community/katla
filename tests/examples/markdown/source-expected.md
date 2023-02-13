@@ -82,6 +82,7 @@ And here is a successful definition (which demonstrates that we have indeed impo
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="IdrisData">,</span>&nbsp;<span class="IdrisData">&quot;the&quot;</span><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="IdrisData">,</span>&nbsp;<span class="IdrisData">&quot;Markdown&quot;</span><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="IdrisData">,</span>&nbsp;<span class="IdrisData">&quot;mode&quot;</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="IdrisData">,</span>&nbsp;<span class="IdrisData">&quot;escaped&nbsp;backticks&quot;</span>&nbsp;<span class="IdrisFunction">&#96;const&#96;</span>&nbsp;<span class="IdrisData">&quot;&quot;</span><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="IdrisData">]</span><br />
 </code>
 

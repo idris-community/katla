@@ -48,5 +48,6 @@ main = putStrLn
      , "the"
      , "Markdown"
      , "mode"
+     , "escaped backticks" `const` ""
      ]
 ```
