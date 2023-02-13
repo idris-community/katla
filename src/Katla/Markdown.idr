@@ -17,6 +17,7 @@ escapeMarkdown config '_' = unpack "\\_"
 escapeMarkdown config '*' = unpack "\\*"
 escapeMarkdown config '$' = unpack "&#36;"
 escapeMarkdown config '\\' = unpack "\\\\"
+escapeMarkdown config '`' = unpack "&#96;"
 escapeMarkdown config c = unpack (htmlEscape $ cast c)
 
 export
