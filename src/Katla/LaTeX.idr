@@ -87,7 +87,7 @@ laTeXHeader cfg =  """
 
 \\newenvironment{code}
   {\\begin{Verbatim}[commandchars=\\\\\\{\\}]}
-  {\\end{Verbartim}}
+  {\\end{Verbatim}}
 
 % Bugfix in fancyvrb to allow inline saved listings
 \\makeatletter
