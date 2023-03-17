@@ -49,9 +49,8 @@
 \newcommand{\IdrisPostulate}[1]{\RawIdrisHighlight{\IdrisHlightColourPostulate}{\IdrisHlightStylePostulate}{#1}}
 \newcommand{\IdrisModule}[1]{\RawIdrisHighlight{\IdrisHlightColourModule}{\IdrisHlightStyleModule}{#1}}
 
-\newenvironment{code}
-  {\begin{Verbatim}[commandchars=\\\{\}]}
-  {\end{Verbatim}}
+\DefineVerbatimEnvironment%
+{code}{Verbatim}{commandchars=\\\{\}}
 
 % Bugfix in fancyvrb to allow inline saved listings
 \makeatletter
