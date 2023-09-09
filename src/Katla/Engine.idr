@@ -242,6 +242,12 @@ engineWithRange input output lineNumberWidth meta driver rowRange currentDecor c
         engineWithRange input output lineNumberWidth meta driver rowRange nextDecor nextPos
 
 export
+codeTeX : LiterateStyle
+codeTeX = MkLitStyle
+              [("\\begin{code}", "\\end{code}")]
+              Nil
+              [".tex", ".ltx"]
+export
 engine : Backend
        -> Config
        -> (input, output : File)
@@ -262,7 +268,7 @@ engine Literate cfg input output lnw meta driver pos
   = do Right content <- fRead input
          | Left err => do putStrLn "Error: \{show err}"
                           exitFailure
-       let Right ts = lexLiterate styleTeX content
+       let Right ts = lexLiterate codeTeX content
          | Left err => do putStrLn "Error: \{show err}"
                           exitFailure
        initSty cfg

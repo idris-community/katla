@@ -18,6 +18,11 @@ main : IO ()
 main = putStrLn "Hello from inside TeX"
 \end{code}
 
+\begin{hidden}
+succ : Nat -> Nat
+succ = S
+\end{hidden}
+
 We're hoping the output pdf will have the \textbf{code blocks} highlighted
 while the rest is typeset by \LaTeX{}.
 

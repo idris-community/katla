@@ -88,6 +88,9 @@ laTeXHeader cfg =  """
 \\DefineVerbatimEnvironment%
 {code}{Verbatim}{commandchars=\\\\\\{\\}}
 
+\\usepackage{comment}
+\\excludecomment{hidden}
+
 % Bugfix in fancyvrb to allow inline saved listings
 \\makeatletter
 \\let\\FV@ProcessLine\\relax
