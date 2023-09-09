@@ -244,7 +244,7 @@ engineWithRange input output lineNumberWidth meta driver rowRange currentDecor c
 export
 codeTeX : LiterateStyle
 codeTeX = MkLitStyle
-              [("\\begin{code}", "\\end{code}")]
+              [(#"\begin{code}"#, #"\end{code}"#)]
               Nil
               [".tex", ".ltx"]
 export
