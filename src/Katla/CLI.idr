@@ -8,6 +8,7 @@ import Katla.HTML
 import Katla.Engine
 
 %default covering
+%hide Collie.Modifiers.infix.(::=)
 
 failWithUsage : {nm : _} -> Command nm -> IO ()
 failWithUsage cmd
