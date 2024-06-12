@@ -2,7 +2,7 @@ rm -rf temp
 mkdir temp
 # Test Katla
 $1 latex init | tee temp/generated.dhall
-$1 latex preamble --config ./temp/generated.dhall | tee temp/katla-preamble.tex
+$1 latex preamble --config temp/generated.dhall | tee temp/katla-preamble.tex
 $1 latex preamble --config ./temp/generated.dhall temp/katla-preamble-direct.tex
 
 

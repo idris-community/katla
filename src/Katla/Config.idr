@@ -184,7 +184,10 @@ export
 getConfiguration : Backend -> (configFile : Maybe String) -> IO Config
 getConfiguration backend Nothing = pure $ defaultConfig backend
 getConfiguration backend (Just filename) = do
-  Right config <- liftIOEither (deriveFromDhallString {ty = Config} filename)
+  Right fileContent <- readFile filename
+  | Left err => putStrLn "Error reading file: \{show err}"
+             >> exitFailure
+  Right config <- liftIOEither (deriveFromDhallString {ty = Config} fileContent)
   | Left err => do putStrLn  """
                      Error while parsing configuration file \{filename}:
                      \{show err}

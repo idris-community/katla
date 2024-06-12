@@ -7,6 +7,8 @@ import System.File
 import Collie
 import Katla.Config
 
+%hide Collie.Modifiers.infix.(::=)
+
 export
 escapeLatex : Char -> List Char
 escapeLatex '-' = fastUnpack "\\KatlaDash{}"
