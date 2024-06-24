@@ -18,20 +18,20 @@ initStyFile = do
 
 export
 makeMacroPre : String -> String
-makeMacroPre name = """
-  \\begin{code}
-  """
+makeMacroPre name = #"""
+  \begin{code}
+  """#
 
 export
 makeMacroPost : String
-makeMacroPost = """
-  \\end{code}
-  """
+makeMacroPost = #"""
+  \end{code}
+  """#
 
 export
 mkDriver : Config -> Driver
 mkDriver config = MkDriver
-  (\ wdth, ln => "", "\\KatlaNewline{}")
+  (\ wdth, ln => "", #"\KatlaNewline{}"#)
   (escapeLatex)
   annotate
   ("", "")
