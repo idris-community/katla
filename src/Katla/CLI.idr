@@ -83,7 +83,7 @@ htmlCmd : Command "html"
 htmlCmd = MkCommand
   { description = """
     HTML backend
-    Usage: html build/ttc/20000101/Katla.idr build/ttc/20000101/Katla.ttm > out.html
+    Usage: html Katla.idr build/ttc/*/Katla.ttm > out.html
     """
   , subcommands =
     [ "init"     ::= initHTMLCmd
