@@ -82,7 +82,10 @@ literateCmd = MkCommand
 export
 htmlCmd : Command "html"
 htmlCmd = MkCommand
-  { description = "HTML backend"
+  { description = """
+    HTML backend
+    Usage: html Katla.idr build/ttc/*/Katla.ttm > out.html
+    """
   , subcommands =
     [ "init"     ::= initHTMLCmd
     ]
