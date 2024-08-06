@@ -1,0 +1,8 @@
+rm -rf temp build
+
+mkdir temp
+
+# Test Katla pandoc
+pandoc ./Source.md --filter "$1-pandoc" -o temp/source.tex
+pandoc ./Source.md --filter "$1-pandoc" -o temp/source.pdf
+diff source-expected.tex temp/source.tex >> output

@@ -1,0 +1,13 @@
+package katla-pandoc
+
+authors = "Robert Wright"
+
+depends = contrib
+
+modules
+  = Katla.Pandoc
+
+main = Katla.Pandoc
+
+executable = katla-pandoc
+sourcedir = "src"

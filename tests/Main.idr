@@ -14,6 +14,7 @@ tests = MkTestPool "Examples using Katla" [] Nothing
   , "init"
   , "markdown"
   , "literate"
+  , "pandoc"
   ]
 
 main : IO ()
