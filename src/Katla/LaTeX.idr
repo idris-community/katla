@@ -121,7 +121,7 @@ standalonePost = """
 export
 makeMacroPre : String -> String
 makeMacroPre name = """
-  \\newcommand\\\{name}[1][]{\\UseVerbatim[#1]{\{name}}}
+  \\newcommand\\\{name}[1][]{\\BUseVerbatim[#1]{\{name}}}
   \\begin{SaveVerbatim}[commandchars=\\\\\\{\\}]{\{name}}
   """
 
