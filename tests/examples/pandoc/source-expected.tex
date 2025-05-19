@@ -15,132 +15,74 @@ anything in the output PDF.
 
 We can use all Idris 2 features. Here's an example code block:
 
-\let\KatlaSnippet\relax{}\newcommand\KatlaSnippet[1][]{\UseVerbatim[#1]{KatlaSnippet}}
-\begin{SaveVerbatim}[commandchars=\\\{\}]{KatlaSnippet}
-\IdrisFunction{x}\KatlaSpace{}\IdrisKeyword{:}\KatlaSpace{}\IdrisType{Nat}\KatlaNewline{}
-\IdrisFunction{x}\KatlaSpace{}\IdrisKeyword{=}\KatlaSpace{}\IdrisData{1}\KatlaSpace{}\IdrisFunction{+}\KatlaSpace{}\IdrisData{2}\KatlaNewline{}
-\end{SaveVerbatim}
 \KatlaSnippet{}
+
+And here's a code block in a \LaTeX{} figure environment:
+
+\newcommand\myfig[2]{
+    \begin{figure}[h]
+    \centering
+    #2
+    \caption{#1}
+    \end{figure}
+}
+
+\myfig{Definition of $y$}{
+
+\KatlaSnippet{}
+
+}
 
 We can use namespaces by adding the \texttt{namespace} attribute, such
 as to provide alternate definitions for functions. Consider this
 function signature:
 
-\let\KatlaSnippet\relax{}\newcommand\KatlaSnippet[1][]{\UseVerbatim[#1]{KatlaSnippet}}
-\begin{SaveVerbatim}[commandchars=\\\{\}]{KatlaSnippet}
-\IdrisFunction{f}\KatlaSpace{}\IdrisKeyword{:}\KatlaSpace{}\IdrisType{Vect}\KatlaSpace{}\IdrisBound{n}\KatlaSpace{}\IdrisBound{a}\KatlaSpace{}\IdrisKeyword{\KatlaDash{}>}\KatlaSpace{}\IdrisType{Vect}\KatlaSpace{}\IdrisKeyword{(}\IdrisBound{n}\KatlaSpace{}\IdrisFunction{+}\KatlaSpace{}\IdrisBound{n}\IdrisKeyword{)}\KatlaSpace{}\IdrisBound{a}\KatlaNewline{}
-\end{SaveVerbatim}
 \KatlaSnippet{}
 
-Here's one implementation for
-\let\KatlaSnippet\relax{}\newcommand\KatlaSnippet[1][]{\UseVerb[#1]{KatlaSnippet}}
-\begin{SaveVerbatim}[commandchars=\\\{\}]{KatlaSnippet}
-\IdrisFunction{f}\KatlaNewline{}
-\end{SaveVerbatim}
-\KatlaSnippet{}:
+Here's one implementation for \KatlaSnippet{}:
 
-\let\KatlaSnippet\relax{}\newcommand\KatlaSnippet[1][]{\UseVerbatim[#1]{KatlaSnippet}}
-\begin{SaveVerbatim}[commandchars=\\\{\}]{KatlaSnippet}
-\IdrisFunction{f}\KatlaSpace{}\IdrisBound{xs}\KatlaSpace{}\IdrisKeyword{=}\KatlaSpace{}\IdrisBound{xs}\KatlaSpace{}\IdrisFunction{++}\KatlaSpace{}\IdrisBound{xs}\KatlaNewline{}
-\end{SaveVerbatim}
 \KatlaSnippet{}
 
 By repeating the signature in a different namespace, in a hidden code
 block, I can give an alternate definition:
 
-\let\KatlaSnippet\relax{}\newcommand\KatlaSnippet[1][]{\UseVerbatim[#1]{KatlaSnippet}}
-\begin{SaveVerbatim}[commandchars=\\\{\}]{KatlaSnippet}
-\IdrisFunction{f}\KatlaSpace{}\IdrisBound{xs}\KatlaSpace{}\IdrisKeyword{=}\KatlaSpace{}\IdrisBound{xs}\KatlaSpace{}\IdrisFunction{++}\KatlaSpace{}\IdrisFunction{reverse}\KatlaSpace{}\IdrisBound{xs}\KatlaNewline{}
-\end{SaveVerbatim}
 \KatlaSnippet{}
 
 \hypertarget{inline-code}{%
 \section{Inline Code}\label{inline-code}}
 
 As well as block code, we can have inline code, like
-\let\KatlaSnippet\relax{}\newcommand\KatlaSnippet[1][]{\UseVerb[#1]{KatlaSnippet}}
-\begin{SaveVerbatim}[commandchars=\\\{\}]{KatlaSnippet}
-\IdrisFunction{the}\KatlaSpace{}\IdrisType{Nat}\KatlaSpace{}\IdrisData{3}\KatlaNewline{}
-\end{SaveVerbatim}
-\KatlaSnippet{}. Here's another:
-\let\KatlaSnippet\relax{}\newcommand\KatlaSnippet[1][]{\UseVerb[#1]{KatlaSnippet}}
-\begin{SaveVerbatim}[commandchars=\\\{\}]{KatlaSnippet}
-\IdrisData{1}\KatlaSpace{}\IdrisFunction{+}\KatlaSpace{}\IdrisData{2}\KatlaNewline{}
-\end{SaveVerbatim}
-\KatlaSnippet{}. We can also call the function we previously defined:
-\let\KatlaSnippet\relax{}\newcommand\KatlaSnippet[1][]{\UseVerb[#1]{KatlaSnippet}}
-\begin{SaveVerbatim}[commandchars=\\\{\}]{KatlaSnippet}
-\IdrisFunction{f}\KatlaSpace{}\IdrisData{[1,}\KatlaSpace{}\IdrisData{2,}\KatlaSpace{}\IdrisData{3]}\KatlaNewline{}
-\end{SaveVerbatim}
-\KatlaSnippet{}.
+\KatlaSnippet{}. Here's another: \KatlaSnippet{}. We can
+also call the function we previously defined: \KatlaSnippet{}.
 
 By default, a code block is interpreted as top-level Idris 2
 declarations, while inline code is interpreted as an expression. But we
 can switch it up if we wish.
 
 By using the \texttt{decls} class, we can write an inline declaration:
-\let\KatlaSnippet\relax{}\newcommand\KatlaSnippet[1][]{\UseVerb[#1]{KatlaSnippet}}
-\begin{SaveVerbatim}[commandchars=\\\{\}]{KatlaSnippet}
-\IdrisFunction{g}\KatlaSpace{}\IdrisKeyword{:}\KatlaSpace{}\IdrisType{Nat}\KatlaSpace{}\IdrisKeyword{\KatlaDash{}>}\KatlaSpace{}\IdrisType{Nat}\KatlaNewline{}
-\end{SaveVerbatim}
 \KatlaSnippet{}.
 
 By using the \texttt{expr} class, we can write a block expression:
 
-\let\KatlaSnippet\relax{}\newcommand\KatlaSnippet[1][]{\UseVerbatim[#1]{KatlaSnippet}}
-\begin{SaveVerbatim}[commandchars=\\\{\}]{KatlaSnippet}
-\IdrisData{[}\KatlaNewline{}
-\KatlaSpace{}\KatlaSpace{}\KatlaSpace{}\KatlaSpace{}\IdrisData{1,}\KatlaNewline{}
-\KatlaSpace{}\KatlaSpace{}\KatlaSpace{}\KatlaSpace{}\IdrisData{2,}\KatlaNewline{}
-\KatlaSpace{}\KatlaSpace{}\KatlaSpace{}\KatlaSpace{}\IdrisData{3}\KatlaNewline{}
-\IdrisData{]}\KatlaNewline{}
-\end{SaveVerbatim}
 \KatlaSnippet{}
 
 \hypertarget{types}{%
 \section{Types}\label{types}}
 
 Sometimes, Idris 2 cannot infer the type of an expression. Is
-\let\KatlaSnippet\relax{}\newcommand\KatlaSnippet[1][]{\UseVerb[#1]{KatlaSnippet}}
-\begin{SaveVerbatim}[commandchars=\\\{\}]{KatlaSnippet}
-\IdrisData{[1,}\KatlaSpace{}\IdrisData{2,}\KatlaSpace{}\IdrisData{3]}\KatlaNewline{}
-\end{SaveVerbatim}
-\KatlaSnippet{} a
-\let\KatlaSnippet\relax{}\newcommand\KatlaSnippet[1][]{\UseVerb[#1]{KatlaSnippet}}
-\begin{SaveVerbatim}[commandchars=\\\{\}]{KatlaSnippet}
-\IdrisType{List}\KatlaSpace{}\IdrisType{Nat}\KatlaNewline{}
-\end{SaveVerbatim}
-\KatlaSnippet{}, or a
-\let\KatlaSnippet\relax{}\newcommand\KatlaSnippet[1][]{\UseVerb[#1]{KatlaSnippet}}
-\begin{SaveVerbatim}[commandchars=\\\{\}]{KatlaSnippet}
-\IdrisType{Vect}\KatlaSpace{}\IdrisData{3}\KatlaSpace{}\IdrisType{Integer}\KatlaNewline{}
-\end{SaveVerbatim}
-\KatlaSnippet{}? We can use the \texttt{type} attribute to tell Idris 2
-which one it should be.
+\KatlaSnippet{} a \KatlaSnippet{}, or a
+\KatlaSnippet{}? We can use the \texttt{type} attribute to tell
+Idris 2 which one it should be.
 
 \hypertarget{multiple-files}{%
 \section{Multiple Files}\label{multiple-files}}
 
 If you need an import to \emph{not} be available, namespaces are not
 enough. We can use the \texttt{file} attribute to put snippets in
-separate files. For example, the signature of
-\let\KatlaSnippet\relax{}\newcommand\KatlaSnippet[1][]{\UseVerb[#1]{KatlaSnippet}}
-\begin{SaveVerbatim}[commandchars=\\\{\}]{KatlaSnippet}
-\IdrisFunction{f}\KatlaNewline{}
-\end{SaveVerbatim}
-\KatlaSnippet{} fails to compile if we use a new file, that hasn't
-imported
-\let\KatlaSnippet\relax{}\newcommand\KatlaSnippet[1][]{\UseVerb[#1]{KatlaSnippet}}
-\begin{SaveVerbatim}[commandchars=\\\{\}]{KatlaSnippet}
-\IdrisType{Vect}\KatlaNewline{}
-\end{SaveVerbatim}
+separate files. For example, the signature of \KatlaSnippet{}
+fails to compile if we use a new file, that hasn't imported
 \KatlaSnippet{}.
 
-\let\KatlaSnippet\relax{}\newcommand\KatlaSnippet[1][]{\UseVerbatim[#1]{KatlaSnippet}}
-\begin{SaveVerbatim}[commandchars=\\\{\}]{KatlaSnippet}
-\IdrisKeyword{failing}\KatlaSpace{}\IdrisData{"Undefined\KatlaSpace{}name\KatlaSpace{}Vect."}\KatlaNewline{}
-\KatlaSpace{}\KatlaSpace{}\KatlaSpace{}\KatlaSpace{}\IdrisFunction{f}\KatlaSpace{}\IdrisKeyword{:}\KatlaSpace{}Vect\KatlaSpace{}n\KatlaSpace{}a\KatlaSpace{}\IdrisKeyword{\KatlaDash{}>}\KatlaSpace{}Vect\KatlaSpace{}\IdrisKeyword{(}n\KatlaSpace{}+\KatlaSpace{}n\IdrisKeyword{)}\KatlaSpace{}a\KatlaNewline{}
-\end{SaveVerbatim}
 \KatlaSnippet{}
 
 \hypertarget{packages}{%
@@ -150,11 +92,4 @@ We can add Idris 2 packages to the YAML metadata of the Markdown file,
 using the \texttt{idris2-packages} key. For example, adding
 \texttt{contrib} allows us to use the \texttt{Language.JSON} module.
 
-\let\KatlaSnippet\relax{}\newcommand\KatlaSnippet[1][]{\UseVerbatim[#1]{KatlaSnippet}}
-\begin{SaveVerbatim}[commandchars=\\\{\}]{KatlaSnippet}
-\IdrisKeyword{import}\KatlaSpace{}\IdrisModule{Language.JSON}\KatlaNewline{}
-\KatlaNewline{}
-\IdrisFunction{x}\KatlaSpace{}\IdrisKeyword{:}\KatlaSpace{}\IdrisType{Maybe}\KatlaSpace{}\IdrisType{JSON}\KatlaNewline{}
-\IdrisFunction{x}\KatlaSpace{}\IdrisKeyword{=}\KatlaSpace{}\IdrisFunction{parse}\KatlaSpace{}\IdrisData{\#"\{"x":\KatlaSpace{}1,\KatlaSpace{}"y":\KatlaSpace{}2\}"\#}\KatlaNewline{}
-\end{SaveVerbatim}
 \KatlaSnippet{}
