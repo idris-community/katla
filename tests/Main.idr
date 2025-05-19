@@ -1,11 +1,18 @@
 module Main
 
+import System
 import Test.Golden
 
 %default covering
 
-tests : TestPool
-tests = MkTestPool "Examples using Katla" [] Nothing
+Pandoc : Requirement
+Pandoc = MkReq "pandoc" $ do
+    (_, 0) <- run "command -v pandoc"
+        | _ => pure Nothing
+    pure $ Just "pandoc"
+
+baseTests : TestPool
+baseTests = MkTestPool "Examples using Katla" [] Nothing
   [ "standalone"
   , "raw-snippet"
   , "preamble"
@@ -14,12 +21,17 @@ tests = MkTestPool "Examples using Katla" [] Nothing
   , "init"
   , "markdown"
   , "literate"
-  , "pandoc"
+  ]
+
+pandocTests : TestPool
+pandocTests = MkTestPool "Examples using Katla-Pandoc" [Pandoc] Nothing
+  [ "pandoc"
   ]
 
 main : IO ()
 main = runner
-  [ withPath "examples" tests
+  [ withPath "examples" baseTests
+  , withPath "examples" pandocTests
   ]
 
  where
