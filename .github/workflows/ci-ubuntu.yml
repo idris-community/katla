@@ -49,7 +49,7 @@ jobs:
       # This caching step allows us to save a lot of building time by only
       # self-hosting Idris2 from boostrap if absolutely necessary
       - name: Cache Idris2
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         id: cache-idris2
         with:
           path: |
