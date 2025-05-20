@@ -24,9 +24,9 @@ on:
 ########################################################################
 
 env:
-  IDRIS2_COMMIT: 9e84b153bd3d7d5a63ec9e6a9adfa47a067ea172
+  IDRIS2_COMMIT: e4431891e915c6866a6eea18046dcb3bcdfa8d89
   COLLIE_COMMIT: ed2eda5e04fbd02a7728e915d396e14cc7ec298e
-  IDRALL_COMMIT: 62a455894b1db5134c8b56d31aadb31d483a4b2c
+  IDRALL_COMMIT: 86d84e44f7e2d07e597ca10b7d0a3451992b5605
   SCHEME: scheme
 
 ########################################################################
@@ -61,6 +61,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y chezscheme
           sudo apt-get install -y texlive texlive-fonts-extra
+          sudo apt-get install -y pandoc
 
       - name: Install Idris2 & its API
         if: steps.cache-idris2.outputs.cache-hit != 'true'

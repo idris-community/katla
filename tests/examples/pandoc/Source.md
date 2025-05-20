@@ -24,6 +24,31 @@ x : Nat
 x = 1 + 2
 ```
 
+And here's a code block in a \LaTeX{} figure environment:
+
+```{=latex}
+\newcommand\myfig[2]{
+    \begin{figure}[h]
+    \centering
+    #2
+    \caption{#1}
+    \end{figure}
+}
+```
+
+```{=latex}
+\myfig{Definition of $y$}{
+```
+
+```idr
+y : Nat
+y = x + 3
+```
+
+```{=latex}
+}
+```
+
 We can use namespaces by adding the `namespace` attribute, such as to provide alternate definitions for functions. Consider this function signature:
 
 ```{.idr namespace="A"}
