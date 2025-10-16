@@ -10,7 +10,7 @@ import Core.Metadata
 import Libraries.Data.PosMap
 import Libraries.Text.Literate
 import Libraries.Text.Bounded
-import Parser.Unlit
+import Idris.Parser.Core.Unlit
 import Data.List1
 import Data.List
 import Data.Maybe
