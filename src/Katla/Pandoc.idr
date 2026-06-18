@@ -161,36 +161,39 @@ checkCode dir packages snippets = do
             | (msg, err) => die $ "Error checking Idris code (exit code: \{show err})\n" ++ msg
         pure ()
 
+addPandocHeaderIncludes : List String -> JSON -> JSON
+addPandocHeaderIncludes newHeaders doc = do
+    let newHeaders = map (\newHeader => JObject [
+            ("t", JString "MetaBlocks"),
+            ("c", JArray [JObject [
+                ("t", JString "RawBlock"),
+                ("c", JArray [JString "tex", JString newHeader])
+            ]])
+        ]) newHeaders
+    update (Just . update (Just . update (Just . (\case
+        JArray existingHeaders => JArray $ existingHeaders ++ newHeaders
+        existingHeader => JArray $ existingHeader :: newHeaders) .
+        maybe (JArray []) id) "c" .
+        maybe (JObject [("t", JString "MetaList")]) id) "header-includes" .
+        maybe (JObject []) id) "meta" doc
+
 covering
 addKatlaHeader : JSON -> IO JSON
 addKatlaHeader doc = do
     (katlaHeader, 0) <- run "katla latex preamble"
         | (_, err) => die "Error getting Katla header (exit code: \{show err})"
 
-    let pandocKatlaHeader = JObject [
-        ("t", JString "MetaBlocks"),
-        ("c", JArray [JObject [
-            ("t", JString "RawBlock"),
-            ("c", JArray [JString "tex", JString katlaHeader])
-        ]])
-    ]
-
-    pure $ update (Just . update (Just . update (Just . (\case
-          JArray xs => JArray $ pandocKatlaHeader :: xs
-          json => json) .
-          maybe (JArray []) id) "c" .
-          maybe (JObject [("t", JString "MetaList")]) id) "header-includes" .
-          maybe (JObject []) id) "meta" doc
+    pure $ addPandocHeaderIncludes [katlaHeader] doc
 
 covering
-formatSnippet : (dir : String) -> Snippet -> (start : Nat) -> (len : Nat) -> IO JSON
-formatSnippet dir snippet start len = do
+formatSnippet : (dir : String) -> Snippet -> (snippetName : String) -> (start : Nat) -> (len : Nat) -> IO (Maybe String, JSON)
+formatSnippet dir snippet snippetName start len = do
     let False = snippet.hide
-        | True => pure $ JObject [("t", JString "Para"), ("c", JArray [])]
+        | True => pure (Nothing, JObject [("t", JString "Para"), ("c", JArray [])])
 
     let katlaCmd = case snippet.displayType of
-          Block => "katla latex macro KatlaSnippet \{dir}/\{snippet.file}.idr build/ttc/*/\{dir}/\{snippet.file}.ttm \{show start} 0 \{show len}"
-          Inline => "katla latex macro inline KatlaSnippet \{dir}/\{snippet.file}.idr build/ttc/*/\{dir}/\{snippet.file}.ttm \{show start} 0 \{show $ 1 + len} \{show $ 8 + length snippet.code}"
+          Block => "katla latex macro \{snippetName} \{dir}/\{snippet.file}.idr build/ttc/*/\{dir}/\{snippet.file}.ttm \{show start} 0 \{show len}"
+          Inline => "katla latex macro inline \{snippetName} \{dir}/\{snippet.file}.idr build/ttc/*/\{dir}/\{snippet.file}.ttm \{show start} 0 \{show $ 1 + len} \{show $ 8 + length snippet.code}"
     (out, 0) <- run katlaCmd
         | (_, err) => die "Error running Katla (exit code: \{show err})"
 
@@ -199,13 +202,10 @@ formatSnippet dir snippet start len = do
           Decls => out
           Expr _ => dedent out
 
-    pure $ JObject [
+    pure (Just out, JObject [
         ("t", JString $ case snippet.displayType of Block => "RawBlock"; Inline => "RawInline"),
-        ("c", JArray [
-            JString "tex",
-            JString $ "\\let\\KatlaSnippet\\relax{}" ++ out ++ "\\KatlaSnippet{}"
-        ])
-    ]
+        ("c", JArray [ JString "tex", JString "\\\{snippetName}{}"])
+    ])
   where
     katlaIndent : String
     katlaIndent = "\\KatlaSpace{}\\KatlaSpace{}\\KatlaSpace{}\\KatlaSpace{}"
@@ -223,13 +223,31 @@ formatSnippet dir snippet start len = do
 
 covering
 addKatlaSnippets : (dir : String) -> List Snippet -> List (Nat, Nat) -> JSON -> IO JSON
-addKatlaSnippets dir snippets ranges json = do
-    evalStateT ranges $ traverseSnippets (\snippet => do
-        Just (start, len) <- gets head'
-            | Nothing => die "katla-pandoc internal error"
-        modify (\case [] => []; _ :: xs => xs)
-        lift $ formatSnippet dir snippet start len
-      ) json
+addKatlaSnippets dir snippets ranges doc = do
+    ((headers, _), doc) <- runStateT (the (SnocList String) [<], ranges) $ traverseSnippets (\snippet => do
+        (headers, (start, len) :: rest) <- get {stateType = (SnocList String, List (Nat, Nat))}
+            | _ => die "katla-pandoc internal error"
+
+        snippetName <- lift genName
+        (newHeader, json) <- lift $ formatSnippet dir snippet snippetName start len
+
+        put (
+            case newHeader of Nothing => headers; Just newHeader => headers :< newHeader,
+            rest
+          )
+
+        pure json
+      ) doc
+
+    pure $ addPandocHeaderIncludes (cast headers) doc
+  where
+    alpha : List Char
+    alpha = unpack "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+    genName : IO String
+    genName = do
+        suffix <- for (replicate 6 ()) $ \() => rndSelect alpha
+        pure "KatlaSnippet\{pack suffix}"
 
 covering
 main : IO ()
