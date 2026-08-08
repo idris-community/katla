@@ -1,0 +1,10 @@
+package katla-typst
+
+authors = "Stefan Höck"
+
+depends = idris2, contrib, collie, idrall
+
+main = Katla.Typst.Main
+
+executable = katla-typst
+sourcedir = "src"

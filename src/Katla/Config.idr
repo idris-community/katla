@@ -167,15 +167,63 @@ defaultLatexConfig = MkConfig
     , colour = "black"
     }
   }
+
+export
+defaultTypstConfig : Config
+defaultTypstConfig = MkConfig
+  { font = #"Liberation Mono"#
+  , space = #" "#
+  , datacons = MkCategory
+    { style  = #", "normal", "medium""#
+    , colour = "rgb(\"#ff6a6a\")"
+    }
+  , typecons = MkCategory
+    { style  = #", "normal", "medium""#
+    , colour = "rgb(\"#009acd\")"
+    }
+  , bound = MkCategory
+    { style  = #", "normal", "medium""#
+    , colour = "rgb(\"#9a32cd\")"
+    }
+  , function = MkCategory
+    { style  = #", "normal", "medium""#
+    , colour = "rgb(\"#458b00\")"
+    }
+  , keyword = MkCategory
+    { style  = #", "normal", "bold""#
+    , colour = "color.black"
+    }
+  , comment = MkCategory
+    { style  = #", "italic", "medium""#
+    , colour = "rgb(\"#cdcdc1\")"
+    }
+  , hole = MkCategory
+    { style  = #", "normal", "bold""#
+    , colour = "color.yellow"
+    }
+  , namespce = MkCategory
+    { style = #", "italic", "medium""#
+    , colour = "color.black"
+    }
+  , postulte = MkCategory
+    { style = #", "normal", "bold""#
+    , colour = "rgb(\"#9a32cd\")"
+    }
+  , aModule  = MkCategory
+    { style = #", "italic", "medium""#
+    , colour = "color.black"
+    }
+  }
 %runElab (deriveFromDhall Record `{ Category })
 %runElab (deriveFromDhall Record `{ Config })
 
 public export
-data Backend = LaTeX | HTML | Markdown | Literate
+data Backend = LaTeX | Typst | HTML | Markdown | Literate
 
 export
 defaultConfig : Backend -> Config
 defaultConfig LaTeX = defaultLatexConfig
+defaultConfig Typst = defaultTypstConfig
 defaultConfig HTML = defaultHTMLConfig
 defaultConfig Markdown = defaultHTMLConfig
 defaultConfig Literate = defaultLatexConfig
