@@ -46,6 +46,22 @@ $ grep usepackage src/Katla/LaTeX.idr
 Active examples of using Katla can be found in the main repository of Idris2:  
 https://github.com/idris-lang/Idris2/blob/main/.github/scripts/katla.sh
 
+## Using `katla-typst`
+
+To generate semantically highlighted typst documents from literate `.typ`
+files, build and invoke `katla-typst`:
+
+```console
+$ katla-typst path/to/src/Foo.typ path/to/ttm/Foo.ttm > KFoo.typ
+```
+
+In order to use the output of the above command, you also need to
+append the output of `katla-typst preamble` to your template file:
+
+```console
+$ katla-typst preamble >> my_template.typ
+```
+
 # Demo
 See [example tests](./tests/examples).
 
