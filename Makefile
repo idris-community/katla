@@ -7,6 +7,9 @@ src: src/**/*.idr
 build/exec/katla: src 
 	idris2 --build katla.ipkg
 
+build/exec/katla-typst: src 
+	idris2 --build katla-typst.ipkg
+
 build/exec/katla-pandoc: .PHONY
 	idris2 --build katla-pandoc.ipkg
 

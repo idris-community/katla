@@ -10,6 +10,7 @@ import Katla.Engine
 %default covering
 %hide Collie.Modifiers.infix.(::=)
 
+export
 failWithUsage : {nm : _} -> Command nm -> IO ()
 failWithUsage cmd
   = do putStrLn cmd.usage

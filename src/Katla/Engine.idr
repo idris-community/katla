@@ -20,6 +20,7 @@ import Data.SnocList
 import Katla.Config
 import Katla.HTML
 import Katla.LaTeX
+import Katla.Typst
 import Katla.Markdown
 import Katla.Literate
 
@@ -250,6 +251,14 @@ engine : Backend
        -> Driver
        -> Position
        -> IO ()
+engine Typst cfg input output lnw meta driver pos
+  = do Right content <- fRead input
+         | Left err => do putStrLn "Error: \{show err}"
+                          exitFailure
+       let Right ts = lexLiterate styleCMark content
+         | Left err => do putStrLn "Error: \{show err}"
+                          exitFailure
+       engineLitWithDecor output lnw meta driver ts
 engine Markdown cfg input output lnw meta driver pos
   = do Right content <- fRead input
          | Left err => do putStrLn "Error: \{show err}"
@@ -338,6 +347,7 @@ data Snippet
 mkDriver : Backend -> (Config -> Driver)
 mkDriver HTML = HTML.mkDriver
 mkDriver LaTeX = LaTeX.mkDriver
+mkDriver Typst = Typst.mkDriver
 mkDriver Markdown = Markdown.mkDriver
 mkDriver Literate = Literate.mkDriver
 
